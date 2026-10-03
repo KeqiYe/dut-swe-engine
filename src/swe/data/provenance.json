@@ -1,0 +1,7 @@
+{
+  "source": "swe3d_minimal/private/mesh.mat",
+  "sha256": "0612ab2e3e2216294a20c17e1c09e07f8e3f022150e83d58702f9cb53e82662e",
+  "nodes": 547,
+  "triangles": 1006,
+  "transform": "MATLAB one-based triangles converted to zero-based; fixed walls x=0,25 and y=0,30"
+}
