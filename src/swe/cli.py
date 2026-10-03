@@ -35,6 +35,12 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--steps", type=_nonnegative, help="stop after this many steps (also limits duration)")
     p.add_argument("--refinements", type=_nonnegative, default=0)
     p.add_argument("--fps", type=_positive, default=25.0, help="maximum display update frequency")
+    p.add_argument("--speed", type=_positive, default=1.0,
+                   help="interactive playback speed in simulation seconds per wall second")
+    p.add_argument("--loop", action="store_true",
+                   help="replay the interactive case after a short final-frame pause")
+    p.add_argument("--vertical-scale", type=_positive, default=1.0,
+                   help="display-only vertical scale; does not change the simulation")
     p.add_argument("--field", choices=("eta", "depth", "speed"), default="eta")
     p.add_argument("--clim", type=float, nargs=2, metavar=("MIN", "MAX"),
                    help="fixed color range; otherwise taken from initial state")
@@ -87,6 +93,11 @@ def _run_interactive(model, solver, state, spare, viewer, args, dt, duration):
     reset_pending = False
     displayed_time = None
     snapshot = diagnostics = None
+    clock_origin = time.perf_counter()
+    simulation_origin = state.time
+    was_paused = viewer.paused
+    reanchor = False
+    finished_at = None
     with ThreadPoolExecutor(max_workers=1, thread_name_prefix="swe-step") as worker:
         try:
             while viewer.is_running:
@@ -94,6 +105,12 @@ def _run_interactive(model, solver, state, spare, viewer, args, dt, duration):
                 if not viewer.is_running:
                     break
                 reset_pending |= viewer.consume_reset_request()
+                # Observe pause transitions even while a worker owns the state.
+                # Resuming starts from the latest completed state, without a
+                # burst of steps for wall time spent paused.
+                if viewer.paused != was_paused:
+                    reanchor = True
+                    was_paused = viewer.paused
                 if pending is not None:
                     if not pending.done():
                         time.sleep(0.002)
@@ -106,10 +123,15 @@ def _run_interactive(model, solver, state, spare, viewer, args, dt, duration):
                     reset_pending = False
                     displayed_time = None
                     next_display = 0.0
+                    finished_at = None
+                    reanchor = True
 
                 now = time.perf_counter()
+                if reanchor or viewer.paused:
+                    clock_origin, simulation_origin = now, state.time
+                    reanchor = False
                 finished = _done(state, duration, args.steps)
-                if finished:
+                if finished and not args.loop:
                     viewer.paused = True
                 if now >= next_display or (finished and displayed_time != state.time):
                     if displayed_time != state.time:
@@ -118,18 +140,38 @@ def _run_interactive(model, solver, state, spare, viewer, args, dt, duration):
                     displayed_time = state.time
                     next_display = now + 1.0 / args.fps
                 if finished:
-                    if not args.hold:
+                    # In loop mode keep the running/paused control under the
+                    # user's control and show the final state for half a second.
+                    if args.loop:
+                        if finished_at is None or viewer.paused:
+                            finished_at = now
+                        elif now - finished_at >= 0.5:
+                            state, spare = model.state(), model.state()
+                            displayed_time = None
+                            next_display = 0.0
+                            finished_at = None
+                            reanchor = True
+                    elif not args.hold:
                         break
                     time.sleep(0.005)
                     continue
                 single_step = viewer.consume_step_request()
-                if not viewer.paused or single_step:
+                target_time = simulation_origin + (now - clock_origin) * args.speed
+                # Only schedule whole physics steps that are due. The last
+                # step may be shorter to land exactly on the requested duration.
+                available = math.floor((target_time - state.time) / dt + 1e-10)
+                if target_time >= duration:
+                    available = max(available, math.ceil((duration - state.time) / dt))
+                count = 1 if single_step else min(32, max(0, available))
+                if count and (not viewer.paused or single_step):
                     pending = worker.submit(
                         _advance_chunk, solver, state, spare, dt, duration,
-                        args.steps, 1 if single_step else 32,
+                        args.steps, count,
                     )
+                    if single_step:
+                        reanchor = True
                 else:
-                    time.sleep(0.005)
+                    time.sleep(0.002)
         finally:
             # Do not close the CUDA/GUI resources while a state write is active.
             if pending is not None:
@@ -140,10 +182,12 @@ def _run_interactive(model, solver, state, spare, viewer, args, dt, duration):
 def main(argv: list[str] | None = None) -> int:
     p = parser()
     args = p.parse_args(argv)
-    if args.viewer == "none" and (args.paused or args.hold):
-        p.error("--paused and --hold require an interactive viewer")
-    if args.off_screen and (args.viewer != "pyvista" or args.paused or args.hold):
-        p.error("--off-screen requires PyVista, without --paused or --hold")
+    if args.viewer == "none" and (args.paused or args.hold or args.loop):
+        p.error("--paused, --hold, and --loop require an interactive viewer")
+    if args.off_screen and (args.viewer != "pyvista" or args.paused or args.hold or args.loop):
+        p.error("--off-screen requires PyVista, without --paused, --hold, or --loop")
+    if args.loop and args.steps == 0:
+        p.error("--loop requires at least one simulation step")
     if args.screenshot and args.viewer != "pyvista":
         p.error("--screenshot requires --viewer pyvista")
     if not 0 <= args.port <= 65535:
@@ -173,8 +217,13 @@ def main(argv: list[str] | None = None) -> int:
             args.viewer, model, field=args.field, paused=args.paused,
             off_screen=args.off_screen, host=args.host, port=args.port,
             clim=tuple(args.clim) if args.clim is not None else None,
+            vertical_scale=args.vertical_scale,
         )
         print(f"{metadata.get('description', args.case)}; dt={dt:g} s", flush=True)
+        if args.viewer != "none":
+            print(f"Playback: {args.speed:g} simulated s / wall s; "
+                  f"loop={'on' if args.loop else 'off'}; "
+                  f"display vertical scale={args.vertical_scale:g}", flush=True)
         if args.viewer == "viser":
             print(f"Browser viewer: {viewer.url}\n"
                   f"For delltower: ssh -N -L {viewer.server.get_port()}:127.0.0.1:"

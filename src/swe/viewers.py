@@ -80,6 +80,20 @@ def _colors(values: np.ndarray, limits: tuple[float, float]) -> np.ndarray:
     ).astype(np.uint8)
 
 
+def _display_points(points: np.ndarray, vertical_scale: float) -> np.ndarray:
+    """Exaggerate geometry for display without changing solver snapshots."""
+    displayed = np.array(points, dtype=np.float32, copy=True)
+    displayed[:, 2] *= vertical_scale
+    return displayed
+
+
+def _validate_vertical_scale(value: float) -> float:
+    value = float(value)
+    if not np.isfinite(value) or value <= 0:
+        raise ValueError("vertical_scale must be finite and positive")
+    return value
+
+
 def _status(snapshot: dict, diagnostics: dict, paused: bool) -> str:
     return (
         f"t = {float(snapshot['time']):.4f} s   "
@@ -160,6 +174,7 @@ class PyVistaViewer(NullViewer):
     def __init__(
         self, model: Any, *, field: str = "eta", paused: bool = False,
         off_screen: bool = False, clim: tuple[float, float] | None = None,
+        vertical_scale: float = 1.0,
         **_: Any,
     ):
         super().__init__(paused=paused)
@@ -172,6 +187,7 @@ class PyVistaViewer(NullViewer):
                 "PyVista viewer is optional; install with pip install -e '.[desktop]'"
             ) from exc
         self.field = field
+        self._vertical_scale = _validate_vertical_scale(vertical_scale)
         self._clim = _validate_clim(clim)
         self._limits_by_field: dict[str, tuple[float, float]] = {}
         self._snapshot: dict | None = None
@@ -189,7 +205,7 @@ class PyVistaViewer(NullViewer):
         self.plotter.set_background("#edf2f5")
         bed_vertices, bed_triangles = _bed_geometry(model)
         bed_faces = np.column_stack((np.full(len(bed_triangles), 3), bed_triangles)).ravel()
-        bed_mesh = pv.PolyData(bed_vertices, bed_faces)
+        bed_mesh = pv.PolyData(_display_points(bed_vertices, self._vertical_scale), bed_faces)
         self.plotter.add_mesh(bed_mesh, color="#b7aa91", lighting=False)
         self.plotter.add_axes()
         self.plotter.add_text(
@@ -231,7 +247,8 @@ class PyVistaViewer(NullViewer):
         limits = self._clim or self._limits_by_field[self.field]
         values = _scalar(snapshot, self.field)
         if self._mesh is None:
-            self._mesh = self._pv.PolyData(snapshot["points"], self._faces)
+            self._mesh = self._pv.PolyData(
+                _display_points(snapshot["points"], self._vertical_scale), self._faces)
             self._mesh.point_data["field"] = values
             self._actor = self.plotter.add_mesh(
                 self._mesh, scalars="field", clim=limits, lighting=False,
@@ -243,11 +260,12 @@ class PyVistaViewer(NullViewer):
             self.plotter.view_isometric()
             self.plotter.reset_camera()
         else:
-            self._mesh.points = np.asarray(snapshot["points"])
+            self._mesh.points = _display_points(snapshot["points"], self._vertical_scale)
             self._mesh.point_data["field"] = values
             self._actor.mapper.scalar_range = limits
         self.plotter.add_text(
             _status(snapshot, diagnostics, self.paused)
+            + f"\nVertical scale: {self._vertical_scale:g}x (display only)"
             + f"\n{FIELD_LABELS[self.field]}: fixed limits [{limits[0]:.4g}, {limits[1]:.4g}]",
             name="status", position="upper_left", font_size=11, color="#202b35",
         )
@@ -291,7 +309,8 @@ class ViserViewer(NullViewer):
     def __init__(
         self, model: Any, *, field: str = "eta", paused: bool = False,
         host: str = "127.0.0.1", port: int = 8080,
-        clim: tuple[float, float] | None = None, **_: Any,
+        clim: tuple[float, float] | None = None,
+        vertical_scale: float = 1.0, **_: Any,
     ):
         super().__init__(paused=paused)
         if field not in FIELDS:
@@ -303,6 +322,7 @@ class ViserViewer(NullViewer):
                 "Browser viewer is optional; install with pip install -e '.[web]'"
             ) from exc
         self._clim = _validate_clim(clim)
+        self._vertical_scale = _validate_vertical_scale(vertical_scale)
         self._limits_by_field: dict[str, tuple[float, float]] = {}
         self._mesh = None
         self._nodes = None
@@ -325,12 +345,12 @@ class ViserViewer(NullViewer):
         self._server_closed = False
         bed_vertices, bed_triangles = _bed_geometry(model)
         self.server.scene.add_mesh_simple(
-            "/bottom", vertices=bed_vertices.astype(np.float32),
+            "/bottom", vertices=_display_points(bed_vertices, self._vertical_scale),
             faces=bed_triangles.astype(np.uint32), color=(183, 170, 145), side="double",
             cast_shadow=False, receive_shadow=False,
         )
         centre = np.mean(model.points, axis=0)
-        elevation = float(np.max(bed_vertices[:, 2]))
+        elevation = float((np.min(bed_vertices[:, 2]) + np.max(bed_vertices[:, 2])) / 2) * self._vertical_scale
 
         @self.server.on_client_connect
         def _set_camera(client: Any) -> None:
@@ -356,7 +376,7 @@ class ViserViewer(NullViewer):
         field = self._field.value
         limits = self._clim or self._limits_by_field[field]
         colors = _colors(_scalar(snapshot, field), limits)
-        vertices = np.asarray(snapshot["points"], dtype=np.float32)
+        vertices = _display_points(snapshot["points"], self._vertical_scale)
         nodal_vertices = vertices.copy()
         # Only the display overlay is offset to prevent z-fighting.
         nodal_vertices[:, 2] += 1.0e-4 * self._span
@@ -381,6 +401,7 @@ class ViserViewer(NullViewer):
                 f"- Minimum depth: {diagnostics.get('min_depth', float('nan')):.4g} m\n"
                 f"- Maximum speed: {diagnostics.get('max_speed', float('nan')):.4g} m/s\n"
                 f"- Volume: {diagnostics.get('volume', float('nan')):.6g} m³\n\n"
+                f"Vertical scale: **{self._vertical_scale:g}×** (display only; values below are physical).\n\n"
                 f"**{FIELD_LABELS[field]} at nodes** — fixed blue → yellow range: "
                 f"`{limits[0]:.4g}` → `{limits[1]:.4g}`. Values outside this range clip in color."
             )
