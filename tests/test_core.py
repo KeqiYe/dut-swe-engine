@@ -121,3 +121,19 @@ def test_invalid_output_array_does_not_partially_commit():
 def test_small_scale_nonuniform_raster_is_rejected():
     with pytest.raises(ValueError,match="uniform"):
         GridBottom([0,1e-9,3e-9],[0,1],np.zeros((3,2)))
+
+
+def test_self_contained_checkpoint_restores_sampled_fields(tmp_path):
+    from swe import load_checkpoint
+    from swe.cases import island
+    m,meta=island(device="cpu"); state=m.state()
+    DisplacementSolver(m).advance(state,.025,meta["dt"])
+    path=tmp_path/"portable.npz"; state.save(path)
+    restored_model,restored=load_checkpoint(path,device="cpu")
+    assert restored_model.fingerprint==m.fingerprint
+    assert restored.time==state.time
+    np.testing.assert_array_equal(restored.to_numpy()["displacement"],state.to_numpy()["displacement"])
+    a,b=m.state(),restored_model.state()
+    DisplacementSolver(m).step(state,a,meta["dt"])
+    DisplacementSolver(restored_model).step(restored,b,meta["dt"])
+    np.testing.assert_array_equal(a.velocity,b.velocity)

@@ -4,7 +4,7 @@ import hashlib
 import copy
 import numpy as np
 from .mesh import Mesh
-from .terrain import FlatBottom, GridBottom
+from .terrain import FlatBottom, GridBottom, GaussianBottom, ParabolicBottom
 from .backends.numpy_backend import NumpyBackend, QUADRATURE, geometry
 
 
@@ -68,7 +68,9 @@ class Model:
             raise AttributeError("finalized models are immutable; use a new ModelBuilder to change parameters")
         object.__setattr__(self,name,value)
 
-    def __init__(self,mesh,bottom,eta,velocity,gravity,density,manning,device):
+    def __init__(self,mesh,bottom,eta,velocity,gravity,density,manning,device,_prepared=None):
+        if not np.isfinite([gravity,density,manning]).all() or gravity<=0 or density<=0 or manning<0:
+            raise ValueError("gravity/density must be positive and manning nonnegative, all finite")
         # A builder may outlive edits to the caller's mutable Mesh instance.
         mesh=Mesh(mesh.points,mesh.triangles,mesh.fixed)
         self.points=mesh.points.copy(); self.triangles=mesh.triangles.copy(); self.fixed=mesh.fixed.copy()
@@ -90,10 +92,23 @@ class Model:
         if not all(np.isfinite(a).all() for a in (bq,bg,bn,bgn)):
             raise ValueError("bathymetry values and gradients must be finite")
         self.depth0=etaq-bq; self.node_depth0=self.surface0-bn
+        if _prepared is not None:
+            # Restore sampled initial data and geometry byte-for-byte. Evaluating
+            # exp/sin again on a different CPU can change their last few bits.
+            for name,shape in (("depth0",(len(p),3)),("node_depth0",(len(self.points),)),
+                               ("area",(len(p),)),("grad",(len(p),3,2)),("qref",(len(p),3,2))):
+                value=np.array(_prepared[name],dtype=np.float64,copy=True)
+                if value.shape!=shape or not np.isfinite(value).all():
+                    raise ValueError(f"invalid checkpoint model array {name}")
+                setattr(self,name,value)
+            if np.any(self.area<=0): raise ValueError("invalid checkpoint reference areas")
         if np.any(self.depth0<=0) or np.any(self.node_depth0 < -1e-10):
             raise ValueError("mesh must cover the initially wet region; quadrature depth must be positive")
         localmass=self.density*self.area[:,None]/3*np.einsum('eq,qi->ei',self.depth0,QUADRATURE)
         self.mass=np.bincount(self.triangles.ravel(),weights=localmass.ravel(),minlength=len(self.points))
+        if _prepared is not None:
+            self.mass=np.array(_prepared["mass"],dtype=np.float64,copy=True)
+            if self.mass.shape!=(len(self.points),): raise ValueError("invalid checkpoint mass shape")
         if not np.isfinite(self.mass).all() or np.any(self.mass<=0):
             raise ValueError("all lumped nodal masses must be finite and positive")
         self.initial_velocity=_field(velocity,self.points,len(self.points),2)
@@ -125,6 +140,7 @@ class Model:
         digest=hashlib.sha256()
         kind,params,grid=self.bottom.warp_spec()
         for a in (self.points,self.triangles,self.fixed,self.depth0,self.node_depth0,self.initial_velocity,
+                  self.grad,self.area,self.mass,self.qref,self.surface0,
                   np.array([gravity,density,manning,kind]),params,grid):
             a=np.ascontiguousarray(a)
             digest.update(str((a.shape,a.dtype.str)).encode()); digest.update(a.tobytes())
@@ -218,9 +234,35 @@ class State:
 
     def save(self,path):
         path=Path(path); path.parent.mkdir(parents=True,exist_ok=True)
-        np.savez_compressed(path,model_fingerprint=self.model.fingerprint,
+        m=self.model; kind,params,grid=m.bottom.warp_spec()
+        prepared={name:getattr(m,name) for name in ("points","triangles","fixed","surface0","initial_velocity",
+                                                   "depth0","node_depth0","area","grad","qref","mass")}
+        np.savez_compressed(path,format_version=2,model_fingerprint=m.fingerprint,
+                            gravity=m.gravity,density=m.density,manning=m.manning,
+                            bottom_kind=kind,bottom_params=params,bottom_grid=grid,**prepared,
                             displacement=self.model.backend.numpy(self.displacement),
                             velocity=self.model.backend.numpy(self.velocity),time=self.time,step_index=self.step_index)
+
+
+def load_checkpoint(path,device="auto"):
+    """Restore a complete model and state without re-running initial functions.
+
+    Preserving sampled model arrays allows portable CPU/CUDA checkpoints even
+    when math libraries differ slightly between architectures.
+    """
+    with np.load(path,allow_pickle=False) as data:
+        if int(data["format_version"])!=2: raise ValueError("unsupported checkpoint format")
+        kind=int(data["bottom_kind"]); p=data["bottom_params"]; grid=data["bottom_grid"]
+        if kind==0: bottom=FlatBottom(float(p[0]))
+        elif kind==1: bottom=GaussianBottom(height=float(p[1]),center=tuple(p[2:4]),sigma=float(p[4]),base=float(p[0]))
+        elif kind==2: bottom=ParabolicBottom(ax=float(p[1]),ay=float(p[2]),center=tuple(p[3:5]),base=float(p[0]))
+        elif kind==3: bottom=GridBottom(p[0]+np.arange(grid.shape[0])*p[2],p[1]+np.arange(grid.shape[1])*p[3],grid)
+        else: raise ValueError("unsupported checkpoint bathymetry")
+        prepared={name:data[name] for name in ("depth0","node_depth0","area","grad","qref","mass")}
+        mesh=Mesh(data["points"],data["triangles"],data["fixed"])
+        model=Model(mesh,bottom,data["surface0"],data["initial_velocity"],float(data["gravity"]),
+                    float(data["density"]),float(data["manning"]),device,_prepared=prepared)
+    return model,model.load_state(path)
 
 
 class DisplacementSolver:
