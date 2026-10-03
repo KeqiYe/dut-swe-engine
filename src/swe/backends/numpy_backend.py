@@ -63,6 +63,11 @@ class NumpyBackend:
 
     def step(self,q,v,out_q,out_v,dt,min_j=1e-8):
         m=self.model
+        for a in (q,v,out_q,out_v):
+            if not isinstance(a,np.ndarray) or a.shape!=m.points.shape or a.dtype!=np.float64:
+                raise ValueError("state buffers must be float64 arrays of shape (N,2)")
+        if not out_q.flags.writeable or not out_v.flags.writeable or np.shares_memory(out_q,out_v):
+            raise ValueError("output buffers must be writable, distinct arrays")
         f0=self.force(q,v,min_j)
         q1=q+dt*(v+.5*dt*f0/m.mass[:,None])
         q1[m.fixed]=0

@@ -102,3 +102,22 @@ def test_invalid_substeps_and_unrepresentable_time_are_rejected():
     with pytest.raises(ValueError,match="advance"): solver.step(a,b,1e-12)
     assert b.time==0
     with pytest.raises(ValueError,match="advance"): solver.advance(a,1e-12,1e-12)
+
+
+def test_modified_mesh_is_revalidated():
+    mesh=Mesh.rectangle(3,3)
+    builder=ModelBuilder().add_water(mesh=mesh)
+    mesh.triangles[4]=mesh.triangles[4,::-1]
+    with pytest.raises(ValueError,match="counterclockwise"): builder.finalize(device="cpu")
+
+
+def test_invalid_output_array_does_not_partially_commit():
+    m=tank(); a,b=m.state(),m.state(); b.displacement[:]=123
+    b.velocity=np.zeros((len(m.points),3))
+    with pytest.raises(ValueError): DisplacementSolver(m).step(a,b,.01)
+    assert np.all(b.displacement==123) and b.time==0
+
+
+def test_small_scale_nonuniform_raster_is_rejected():
+    with pytest.raises(ValueError,match="uniform"):
+        GridBottom([0,1e-9,3e-9],[0,1],np.zeros((3,2)))

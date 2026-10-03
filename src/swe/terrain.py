@@ -79,7 +79,7 @@ class GridBottom:
         for axis in (self.x,self.y):
             if axis.ndim != 1 or len(axis)<2 or not np.isfinite(axis).all():
                 raise ValueError("raster axes must contain at least two finite values")
-            if np.any(np.diff(axis)<=0) or not np.allclose(np.diff(axis),axis[1]-axis[0],rtol=1e-10):
+            if np.any(np.diff(axis)<=0) or not np.allclose(np.diff(axis),axis[1]-axis[0],rtol=1e-10,atol=0):
                 raise ValueError("raster axes must be increasing and uniformly spaced")
         if self.values.shape != (len(self.x),len(self.y)) or not np.isfinite(self.values).all():
             raise ValueError("raster values must be finite with shape (nx,ny)")

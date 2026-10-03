@@ -69,6 +69,8 @@ class Model:
         object.__setattr__(self,name,value)
 
     def __init__(self,mesh,bottom,eta,velocity,gravity,density,manning,device):
+        # A builder may outlive edits to the caller's mutable Mesh instance.
+        mesh=Mesh(mesh.points,mesh.triangles,mesh.fixed)
         self.points=mesh.points.copy(); self.triangles=mesh.triangles.copy(); self.fixed=mesh.fixed.copy()
         bottom=(GridBottom(bottom.x,bottom.y,bottom.values) if isinstance(bottom,GridBottom) else copy.deepcopy(bottom))
         self.bottom=bottom; self.gravity=gravity; self.density=density; self.manning=manning
@@ -231,6 +233,12 @@ class DisplacementSolver:
         if not np.isfinite(dt) or dt<=0: raise ValueError("dt must be finite and positive")
         self.model._check_state(state_in); self.model._check_state(state_out)
         if state_in is state_out: raise ValueError("use distinct input/output states and swap them after step")
+        inputs=(state_in.displacement,state_in.velocity); outputs=(state_out.displacement,state_out.velocity)
+        for source in inputs:
+            for target in outputs:
+                aliased=(np.shares_memory(source,target) if isinstance(source,np.ndarray) and isinstance(target,np.ndarray)
+                         else getattr(source,"ptr",None)==getattr(target,"ptr",-1))
+                if aliased: raise ValueError("input and output state arrays must not alias")
         next_time=state_in.time+dt
         if not np.isfinite(state_in.time) or state_in.time<0 or not np.isfinite(next_time) or next_time<=state_in.time:
             raise ValueError("dt must advance a finite simulation time; increase dt or reset the time origin")
