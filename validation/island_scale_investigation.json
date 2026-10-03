@@ -1,0 +1,112 @@
+[
+  {
+    "refinement": 1,
+    "dt": 0.003125,
+    "elapsed": 0.4818558740080334,
+    "completed_seconds": 5.243749999999836,
+    "steps": 1678,
+    "error": "Invalid or inverted mesh: element Jacobian is non-finite or <= 1e-08",
+    "min_j_sampled": 0.22104354545036492,
+    "final": {
+      "time": 5.243749999999836,
+      "energy": 372435.73013406195,
+      "potential_energy": 372164.1799859565,
+      "kinetic_energy": 271.5501481054348,
+      "volume": 232.02789428767116,
+      "relative_volume_error": 0.0,
+      "min_j": 0.1522915029870147,
+      "max_j": 2.4659451476247822,
+      "min_depth": 0.0013812332131117415,
+      "max_speed": 6.61271052997741
+    },
+    "suggested_dt": 9.933218273467093e-05
+  },
+  {
+    "refinement": 2,
+    "dt": 0.0015625,
+    "elapsed": 0.9210324609884992,
+    "completed_seconds": 4.367187499999923,
+    "steps": 2795,
+    "error": "Invalid or inverted mesh: element Jacobian is non-finite or <= 1e-08",
+    "min_j_sampled": 0.22317001215584792,
+    "final": {
+      "time": 4.367187499999923,
+      "energy": 372434.801978432,
+      "potential_energy": 372162.0430143731,
+      "kinetic_energy": 272.75896405891376,
+      "volume": 232.02785881008322,
+      "relative_volume_error": 0.0,
+      "min_j": 0.07310310076730486,
+      "max_j": 2.070361315488245,
+      "min_depth": 0.0010094279280626066,
+      "max_speed": 1.98449522925628
+    },
+    "suggested_dt": 8.644442643888999e-05
+  },
+  {
+    "refinement": 3,
+    "dt": 0.00078125,
+    "elapsed": 2.6711059369845316,
+    "completed_seconds": 3.958593750000365,
+    "steps": 5067,
+    "error": "Invalid or inverted mesh: element Jacobian is non-finite or <= 1e-08",
+    "min_j_sampled": 0.09083281397118413,
+    "final": {
+      "time": 3.958593750000365,
+      "energy": 372435.0915465814,
+      "potential_energy": 372162.00078160386,
+      "kinetic_energy": 273.0907649775494,
+      "volume": 232.027858331924,
+      "relative_volume_error": 0.0,
+      "min_j": 0.01898976952384933,
+      "max_j": 1.7412929206045047,
+      "min_depth": 0.0006101050847750734,
+      "max_speed": 10.922609366453676
+    },
+    "suggested_dt": 9.953186699654766e-06
+  },
+  {
+    "refinement": 3,
+    "dt": 0.000390625,
+    "elapsed": 5.366805823985487,
+    "completed_seconds": 4.033593750000611,
+    "steps": 10326,
+    "error": "Invalid or inverted mesh: element Jacobian is non-finite or <= 1e-08",
+    "min_j_sampled": 0.10294208047908504,
+    "final": {
+      "time": 4.033593750000611,
+      "energy": 372435.12174977164,
+      "potential_energy": 372161.7970758225,
+      "kinetic_energy": 273.3246739491447,
+      "volume": 232.027858331924,
+      "relative_volume_error": 0.0,
+      "min_j": 0.007371729231528956,
+      "max_j": 3.4177339818322503,
+      "min_depth": 0.00030969131407142925,
+      "max_speed": 7.3928410273480125
+    },
+    "suggested_dt": 1.1198602133259856e-06
+  },
+  {
+    "refinement": 3,
+    "dt": 0.0001953125,
+    "elapsed": 10.81688816996757,
+    "completed_seconds": 4.080273437498429,
+    "steps": 20891,
+    "error": "Invalid or inverted mesh: element Jacobian is non-finite or <= 1e-08",
+    "min_j_sampled": 0.044369507163940135,
+    "final": {
+      "time": 4.080273437498429,
+      "energy": 372435.1127107168,
+      "potential_energy": 372161.71508867247,
+      "kinetic_energy": 273.3976220442936,
+      "volume": 232.027858331924,
+      "relative_volume_error": 0.0,
+      "min_j": 0.005474917256450218,
+      "max_j": 6.559130767947956,
+      "min_depth": 0.00016136932856292862,
+      "max_speed": 10.30957327609695
+    },
+    "suggested_dt": 3.1159594245654007e-07
+  }
+]

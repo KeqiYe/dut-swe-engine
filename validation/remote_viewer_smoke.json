@@ -1,0 +1,91 @@
+{
+  "verified_at_utc": "2026-10-03T08:06:47.970Z",
+  "passed": true,
+  "remote_host": "delltower",
+  "remote_directory": "/home/yekeqi/swe_engine_validation",
+  "python_version": "3.12.3",
+  "warp_version": "1.17.0",
+  "viser_version": "1.1.1",
+  "cuda_device": "cuda:0",
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "cuda_toolkit": "12.9",
+  "cuda_driver": "13.2",
+  "command": "PYTHONPATH=src .venv/bin/python -m swe.cli --case island --device cuda --viewer viser --steps 8 --hold --port 8093",
+  "transport": {
+    "bind_host": "127.0.0.1",
+    "remote_port": 8093,
+    "local_port": 8093,
+    "ssh_local_forward": true,
+    "http_status": 200
+  },
+  "browser": {
+    "name": "Chrome",
+    "inspection": "CUA",
+    "connected": true,
+    "observed_time_seconds": 0.05,
+    "observed_state": "Paused",
+    "water_surface_visible": true,
+    "nodal_field_colors_visible": true,
+    "static_dry_island_visible": true
+  },
+  "worker_cuda_kernel_load_confirmed": true,
+  "simulation": {
+    "case": "island",
+    "time": 0.049999999999999996,
+    "steps": 8,
+    "wall_seconds": 80.61941723199561,
+    "diagnostics": {
+      "time": 0.049999999999999996,
+      "energy": 372420.7298283172,
+      "potential_energy": 372162.8419435462,
+      "kinetic_energy": 257.88788477096745,
+      "volume": 232.0259269007355,
+      "relative_volume_error": 0,
+      "min_j": 0.9951964157255226,
+      "max_j": 1.0046913156538535,
+      "min_depth": 0.006514841462096738,
+      "max_speed": 0.17609242098758127
+    }
+  },
+  "wall_time_note": "CLI wall_seconds includes waiting during --hold and browser inspection; it is not solver performance.",
+  "cleanup": {
+    "stop_via_browser": true,
+    "server_reported_stopped": true,
+    "ssh_exit_code": 0,
+    "local_tunnel_connection_refused": true,
+    "browser_test_tab_closed": true
+  },
+  "source_changes_required": false,
+  "bounded_worker_validation": {
+    "verified_at_utc": "2026-10-03T08:09:23.571Z",
+    "max_steps_per_batch": 32,
+    "wall_budget_seconds": 0.005,
+    "exact_single_step_checked": true,
+    "step_limit_checked": true,
+    "final_duration_clipping_checked": true,
+    "slow_step_ui_poll_checked": true,
+    "remote_cuda_viser_rerun_passed": true,
+    "remote_result": {
+      "case": "island",
+      "time": 0.049999999999999996,
+      "steps": 8,
+      "wall_seconds": 0.7720834899810143,
+      "diagnostics": {
+        "time": 0.049999999999999996,
+        "energy": 372420.7298283172,
+        "potential_energy": 372162.8419435462,
+        "kinetic_energy": 257.88788477096745,
+        "volume": 232.0259269007355,
+        "relative_volume_error": 0,
+        "min_j": 0.9951964157255226,
+        "max_j": 1.0046913156538535,
+        "min_depth": 0.006514841462096738,
+        "max_speed": 0.17609242098758127
+      }
+    },
+    "local_pyvista_offscreen_rerun_passed": true,
+    "local_steps": 8,
+    "local_time": 0.049999999999999996,
+    "note": "Remote repeated after copying final cli.py. Eight steps stop automatically; timing includes initialization and is not a throughput benchmark."
+  }
+}

@@ -85,7 +85,9 @@ def island(device="auto", refinements=0, gravity=9.81):
     return builder.finalize(device=device), {
         "name": "island",
         "dt": 0.00625 / 2**refinements * np.sqrt(9.81 / gravity),
-        "duration": 10.0 * np.sqrt(9.81 / gravity),
+        "duration": (10.0 if refinements==0 else 3.0) * np.sqrt(9.81 / gravity),
+        "validation_limit": ("Original mesh verified for 10 s" if refinements==0 else
+                             "Refined island verified for 3 s only; compression causes rejection near 4 s at level 3"),
         "description": "Original MATLAB Gaussian island and sech-squared pulse; nondispersive model.",
         "reference": "MATLAB swe3d_minimal, original mesh and dt=0.00625 at gravity=9.81",
         "refinements": refinements,

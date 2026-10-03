@@ -1,0 +1,140 @@
+Building source distribution...
+running egg_info
+writing src/dut_swe_engine.egg-info/PKG-INFO
+writing dependency_links to src/dut_swe_engine.egg-info/dependency_links.txt
+writing entry points to src/dut_swe_engine.egg-info/entry_points.txt
+writing requirements to src/dut_swe_engine.egg-info/requires.txt
+writing top-level names to src/dut_swe_engine.egg-info/top_level.txt
+reading manifest file 'src/dut_swe_engine.egg-info/SOURCES.txt'
+writing manifest file 'src/dut_swe_engine.egg-info/SOURCES.txt'
+running sdist
+running egg_info
+writing src/dut_swe_engine.egg-info/PKG-INFO
+writing dependency_links to src/dut_swe_engine.egg-info/dependency_links.txt
+writing entry points to src/dut_swe_engine.egg-info/entry_points.txt
+writing requirements to src/dut_swe_engine.egg-info/requires.txt
+writing top-level names to src/dut_swe_engine.egg-info/top_level.txt
+reading manifest file 'src/dut_swe_engine.egg-info/SOURCES.txt'
+writing manifest file 'src/dut_swe_engine.egg-info/SOURCES.txt'
+running check
+creating dut_swe_engine-0.1.0
+creating dut_swe_engine-0.1.0/src/dut_swe_engine.egg-info
+creating dut_swe_engine-0.1.0/src/swe
+creating dut_swe_engine-0.1.0/src/swe/backends
+creating dut_swe_engine-0.1.0/src/swe/data
+creating dut_swe_engine-0.1.0/tests
+copying files to dut_swe_engine-0.1.0...
+copying README.md -> dut_swe_engine-0.1.0
+copying pyproject.toml -> dut_swe_engine-0.1.0
+copying src/dut_swe_engine.egg-info/PKG-INFO -> dut_swe_engine-0.1.0/src/dut_swe_engine.egg-info
+copying src/dut_swe_engine.egg-info/SOURCES.txt -> dut_swe_engine-0.1.0/src/dut_swe_engine.egg-info
+copying src/dut_swe_engine.egg-info/dependency_links.txt -> dut_swe_engine-0.1.0/src/dut_swe_engine.egg-info
+copying src/dut_swe_engine.egg-info/entry_points.txt -> dut_swe_engine-0.1.0/src/dut_swe_engine.egg-info
+copying src/dut_swe_engine.egg-info/requires.txt -> dut_swe_engine-0.1.0/src/dut_swe_engine.egg-info
+copying src/dut_swe_engine.egg-info/top_level.txt -> dut_swe_engine-0.1.0/src/dut_swe_engine.egg-info
+copying src/swe/__init__.py -> dut_swe_engine-0.1.0/src/swe
+copying src/swe/__main__.py -> dut_swe_engine-0.1.0/src/swe
+copying src/swe/cases.py -> dut_swe_engine-0.1.0/src/swe
+copying src/swe/cli.py -> dut_swe_engine-0.1.0/src/swe
+copying src/swe/core.py -> dut_swe_engine-0.1.0/src/swe
+copying src/swe/mesh.py -> dut_swe_engine-0.1.0/src/swe
+copying src/swe/terrain.py -> dut_swe_engine-0.1.0/src/swe
+copying src/swe/viewers.py -> dut_swe_engine-0.1.0/src/swe
+copying src/swe/backends/__init__.py -> dut_swe_engine-0.1.0/src/swe/backends
+copying src/swe/backends/numpy_backend.py -> dut_swe_engine-0.1.0/src/swe/backends
+copying src/swe/backends/warp_backend.py -> dut_swe_engine-0.1.0/src/swe/backends
+copying src/swe/data/island_mesh.npz -> dut_swe_engine-0.1.0/src/swe/data
+copying src/swe/data/matlab_reference.npz -> dut_swe_engine-0.1.0/src/swe/data
+copying src/swe/data/provenance.json -> dut_swe_engine-0.1.0/src/swe/data
+copying tests/test_backends.py -> dut_swe_engine-0.1.0/tests
+copying tests/test_benchmarks.py -> dut_swe_engine-0.1.0/tests
+copying tests/test_core.py -> dut_swe_engine-0.1.0/tests
+copying tests/test_matlab_reference.py -> dut_swe_engine-0.1.0/tests
+Writing dut_swe_engine-0.1.0/setup.cfg
+Creating tar archive
+removing 'dut_swe_engine-0.1.0' (and everything under it)
+Building wheel from source distribution...
+running egg_info
+writing src/dut_swe_engine.egg-info/PKG-INFO
+writing dependency_links to src/dut_swe_engine.egg-info/dependency_links.txt
+writing entry points to src/dut_swe_engine.egg-info/entry_points.txt
+writing requirements to src/dut_swe_engine.egg-info/requires.txt
+writing top-level names to src/dut_swe_engine.egg-info/top_level.txt
+reading manifest file 'src/dut_swe_engine.egg-info/SOURCES.txt'
+writing manifest file 'src/dut_swe_engine.egg-info/SOURCES.txt'
+running bdist_wheel
+running build
+running build_py
+creating build/lib/swe
+copying src/swe/terrain.py -> build/lib/swe
+copying src/swe/__init__.py -> build/lib/swe
+copying src/swe/core.py -> build/lib/swe
+copying src/swe/cases.py -> build/lib/swe
+copying src/swe/mesh.py -> build/lib/swe
+copying src/swe/cli.py -> build/lib/swe
+copying src/swe/viewers.py -> build/lib/swe
+copying src/swe/__main__.py -> build/lib/swe
+creating build/lib/swe/backends
+copying src/swe/backends/numpy_backend.py -> build/lib/swe/backends
+copying src/swe/backends/__init__.py -> build/lib/swe/backends
+copying src/swe/backends/warp_backend.py -> build/lib/swe/backends
+running egg_info
+writing src/dut_swe_engine.egg-info/PKG-INFO
+writing dependency_links to src/dut_swe_engine.egg-info/dependency_links.txt
+writing entry points to src/dut_swe_engine.egg-info/entry_points.txt
+writing requirements to src/dut_swe_engine.egg-info/requires.txt
+writing top-level names to src/dut_swe_engine.egg-info/top_level.txt
+reading manifest file 'src/dut_swe_engine.egg-info/SOURCES.txt'
+writing manifest file 'src/dut_swe_engine.egg-info/SOURCES.txt'
+creating build/lib/swe/data
+copying src/swe/data/matlab_reference.npz -> build/lib/swe/data
+copying src/swe/data/island_mesh.npz -> build/lib/swe/data
+copying src/swe/data/provenance.json -> build/lib/swe/data
+installing to build/bdist.macosx-12.1-arm64/wheel
+running install
+running install_lib
+creating build/bdist.macosx-12.1-arm64/wheel
+creating build/bdist.macosx-12.1-arm64/wheel/swe
+creating build/bdist.macosx-12.1-arm64/wheel/swe/backends
+copying build/lib/swe/backends/numpy_backend.py -> build/bdist.macosx-12.1-arm64/wheel/./swe/backends
+copying build/lib/swe/backends/__init__.py -> build/bdist.macosx-12.1-arm64/wheel/./swe/backends
+copying build/lib/swe/backends/warp_backend.py -> build/bdist.macosx-12.1-arm64/wheel/./swe/backends
+copying build/lib/swe/terrain.py -> build/bdist.macosx-12.1-arm64/wheel/./swe
+copying build/lib/swe/__init__.py -> build/bdist.macosx-12.1-arm64/wheel/./swe
+copying build/lib/swe/core.py -> build/bdist.macosx-12.1-arm64/wheel/./swe
+copying build/lib/swe/cases.py -> build/bdist.macosx-12.1-arm64/wheel/./swe
+copying build/lib/swe/mesh.py -> build/bdist.macosx-12.1-arm64/wheel/./swe
+copying build/lib/swe/cli.py -> build/bdist.macosx-12.1-arm64/wheel/./swe
+copying build/lib/swe/viewers.py -> build/bdist.macosx-12.1-arm64/wheel/./swe
+creating build/bdist.macosx-12.1-arm64/wheel/swe/data
+copying build/lib/swe/data/provenance.json -> build/bdist.macosx-12.1-arm64/wheel/./swe/data
+copying build/lib/swe/data/matlab_reference.npz -> build/bdist.macosx-12.1-arm64/wheel/./swe/data
+copying build/lib/swe/data/island_mesh.npz -> build/bdist.macosx-12.1-arm64/wheel/./swe/data
+copying build/lib/swe/__main__.py -> build/bdist.macosx-12.1-arm64/wheel/./swe
+running install_egg_info
+Copying src/dut_swe_engine.egg-info to build/bdist.macosx-12.1-arm64/wheel/./dut_swe_engine-0.1.0-py3.14.egg-info
+running install_scripts
+creating build/bdist.macosx-12.1-arm64/wheel/dut_swe_engine-0.1.0.dist-info/WHEEL
+creating '/Volumes/External/Master_DUT/swe_engine/dist/.tmp-vbehwd6t/dut_swe_engine-0.1.0-py3-none-any.whl' and adding 'build/bdist.macosx-12.1-arm64/wheel' to it
+adding 'swe/__init__.py'
+adding 'swe/__main__.py'
+adding 'swe/cases.py'
+adding 'swe/cli.py'
+adding 'swe/core.py'
+adding 'swe/mesh.py'
+adding 'swe/terrain.py'
+adding 'swe/viewers.py'
+adding 'swe/backends/__init__.py'
+adding 'swe/backends/numpy_backend.py'
+adding 'swe/backends/warp_backend.py'
+adding 'swe/data/island_mesh.npz'
+adding 'swe/data/matlab_reference.npz'
+adding 'swe/data/provenance.json'
+adding 'dut_swe_engine-0.1.0.dist-info/METADATA'
+adding 'dut_swe_engine-0.1.0.dist-info/WHEEL'
+adding 'dut_swe_engine-0.1.0.dist-info/entry_points.txt'
+adding 'dut_swe_engine-0.1.0.dist-info/top_level.txt'
+adding 'dut_swe_engine-0.1.0.dist-info/RECORD'
+removing build/bdist.macosx-12.1-arm64/wheel
+Successfully built dist/dut_swe_engine-0.1.0.tar.gz
+Successfully built dist/dut_swe_engine-0.1.0-py3-none-any.whl

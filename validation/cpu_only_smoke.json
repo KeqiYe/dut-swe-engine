@@ -1,0 +1,7 @@
+{
+  "installed_dependency": "numpy only",
+  "device": "cpu",
+  "reason": "CUDA optional dependency not installed; using CPU",
+  "one_step_time": 0.00625,
+  "passed": true
+}

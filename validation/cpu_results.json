@@ -1,0 +1,141 @@
+{
+  "timestamp_utc": "2026-10-03T07:49:41.746404+00:00",
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "python": "3.13.3",
+  "numpy": "2.5.3",
+  "requested_device": "cpu",
+  "timing": "warm stepping plus ~100 diagnostics, no viewer; compilation/model setup excluded",
+  "cases": {
+    "island_matlab": {
+      "device": "cpu",
+      "nodes": 547,
+      "triangles": 1006,
+      "simulation_seconds": 10,
+      "steps": 1600,
+      "dt": 0.00625,
+      "wall_seconds": 1.1834402919994318,
+      "physical_seconds_per_wall_second": 8.449940455470651,
+      "min_j_sampled": 0.19889697761596936,
+      "max_relative_energy_drift_sampled": 1.6770037813848455e-09,
+      "final": {
+        "time": 9.9999999999997,
+        "energy": 372420.729840851,
+        "potential_energy": 372241.66664658784,
+        "kinetic_energy": 179.06319426311532,
+        "volume": 232.0259269007355,
+        "relative_volume_error": 0.0,
+        "min_j": 0.4462117582584331,
+        "max_j": 2.456765528835294,
+        "min_depth": 0.0036289305457852727,
+        "max_speed": 0.6138190312159185
+      },
+      "max_matlab_relative_state_error": 3.086710458903255e-12
+    },
+    "standing_wave_nx16": {
+      "device": "cpu",
+      "nodes": 85,
+      "triangles": 128,
+      "simulation_seconds": 6.385508568141009,
+      "steps": 801,
+      "dt": 0.007971920809164805,
+      "wall_seconds": 0.11922250000134227,
+      "physical_seconds_per_wall_second": 53.55959292976676,
+      "min_j_sampled": 0.9997984263645616,
+      "max_relative_energy_drift_sampled": 7.639384612780577e-14,
+      "final": {
+        "time": 6.385508568140915,
+        "energy": 49050.000245250005,
+        "potential_energy": 49050.00024519489,
+        "kinetic_energy": 5.5114095375426397e-08,
+        "volume": 10.0,
+        "relative_volume_error": 0.0,
+        "min_j": 0.9999970073665337,
+        "max_j": 1.0000029907103658,
+        "min_depth": 0.9998973013809762,
+        "max_speed": 7.2278915510373595e-06
+      },
+      "relative_surface_rms": 0.005462084338230552
+    },
+    "standing_wave_nx32": {
+      "device": "cpu",
+      "nodes": 165,
+      "triangles": 256,
+      "simulation_seconds": 6.385508568141009,
+      "steps": 801,
+      "dt": 0.007971920809164805,
+      "wall_seconds": 0.22719024999969406,
+      "physical_seconds_per_wall_second": 28.106437526036473,
+      "min_j_sampled": 0.9997988315976718,
+      "max_relative_energy_drift_sampled": 7.669052125839919e-14,
+      "final": {
+        "time": 6.385508568140915,
+        "energy": 49050.000245250005,
+        "potential_energy": 49050.00024523964,
+        "kinetic_energy": 1.0368148389346377e-08,
+        "volume": 10.0,
+        "relative_volume_error": 0.0,
+        "min_j": 0.9999984232186002,
+        "max_j": 1.0000015765458135,
+        "min_depth": 0.9998986152466258,
+        "max_speed": 3.4561117170205006e-06
+      },
+      "relative_surface_rms": 0.0020522004060019275
+    },
+    "standing_wave_nx64": {
+      "device": "cpu",
+      "nodes": 325,
+      "triangles": 512,
+      "simulation_seconds": 6.385508568141009,
+      "steps": 1281,
+      "dt": 0.00498478420619907,
+      "wall_seconds": 0.4751231660011399,
+      "physical_seconds_per_wall_second": 13.439691063444565,
+      "min_j_sampled": 0.9997993536082876,
+      "max_relative_energy_drift_sampled": 3.011252575523218e-14,
+      "final": {
+        "time": 6.3855085681408985,
+        "energy": 49050.000245250005,
+        "potential_energy": 49050.00024524762,
+        "kinetic_energy": 2.3878424628841746e-09,
+        "volume": 10.0,
+        "relative_volume_error": 0.0,
+        "min_j": 0.9999993473760875,
+        "max_j": 1.0000006525693543,
+        "min_depth": 0.9998994202880268,
+        "max_speed": 1.603266391006807e-06
+      },
+      "relative_surface_rms": 0.0007597962283773356
+    },
+    "sloshing_three_periods": {
+      "device": "cpu",
+      "nodes": 385,
+      "triangles": 720,
+      "simulation_seconds": 42.55510060328662,
+      "steps": 8152,
+      "dt": 0.005220203705015533,
+      "wall_seconds": 4.463288625000132,
+      "physical_seconds_per_wall_second": 9.5344720403972,
+      "min_j_sampled": 0.994226946514898,
+      "max_relative_energy_drift_sampled": 4.992926262447268e-09,
+      "final": {
+        "time": 42.55510060328396,
+        "energy": 1031140.0075769301,
+        "potential_energy": 1031139.9972948045,
+        "kinetic_energy": 0.01028212557784744,
+        "volume": 157.0780985315784,
+        "relative_volume_error": 0.0,
+        "min_j": 0.994998118142591,
+        "max_j": 1.0024274129650677,
+        "min_depth": 0.04376858087060136,
+        "max_speed": 0.0018252489322893126
+      },
+      "material_displacement_rms": 0.02330534973274533,
+      "material_displacement_vector_rms": 0.032958741667896634
+    }
+  },
+  "status": "passed",
+  "displacement_error_definitions": {
+    "material_displacement_rms": "RMS over both nodes and 2 components",
+    "material_displacement_vector_rms": "sqrt(mean over nodes of squared Euclidean displacement error)); exactly sqrt(2) times component RMS"
+  }
+}

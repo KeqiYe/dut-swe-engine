@@ -1,0 +1,15 @@
+Warp 1.17.0 initialized:
+   CUDA Toolkit 12.9, Driver 13.2
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 4090" (22 GiB, sm_89, mempool enabled)
+   Kernel cache:
+     /home/yekeqi/.cache/warp/1.17.0
+Module swe.backends.warp_backend d6bac5b load on device 'cuda:0' took 2.58 ms  (cached)
+PASS island MATLAB 10 s
+PASS standing-wave spatial trend [0.005462084338468642, 0.0020522004063334987, 0.0007597962284912868]
+PASS sloshing three periods
+PASS island 64,384 elements / 3 s (10 s remains unsupported)
+PASS standing wave 50,000 elements / one period
+PASS sloshing 50,800 elements / one period
+validation/cuda_results.json

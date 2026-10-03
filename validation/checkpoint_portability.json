@@ -1,0 +1,19 @@
+{
+  "source": "Linux x86_64 CUDA RTX4090",
+  "destination": "macOS arm64 NumPy CPU",
+  "loaded_time": 0.10000000000000002,
+  "advanced_time": 0.10625000000000002,
+  "model_fingerprint_verified": true,
+  "final": {
+    "time": 0.10625000000000002,
+    "energy": 372420.72987560043,
+    "potential_energy": 372164.03242836747,
+    "kinetic_energy": 256.69744723294593,
+    "volume": 232.0259269007355,
+    "relative_volume_error": 0.0,
+    "min_j": 0.9896538171531861,
+    "max_j": 1.01000636844626,
+    "min_depth": 0.006514070367937686,
+    "max_speed": 0.17427775082751037
+  }
+}
