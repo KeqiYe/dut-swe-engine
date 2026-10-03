@@ -7,6 +7,25 @@ Hammer 积分、集中质量和显式 Verlet 推进。水底高程向上为正�
 这是**非色散、深度平均浅水模型**；三维显示由水平位置、水深和地形重建，
 没有独立求解竖向速度。版本控制在本目录的 `.git` 中，原 MATLAB 和论文未修改。
 
+## 作为包导入到自己的程序
+
+安装包名为 `dut-swe-engine`，代码中使用 `import swe`。
+从 [examples/basic.py](examples/basic.py) 开始：该文件自己构建网格、地形和
+初始水面，并显式调用 `swe.DisplacementSolver.step()`，展示应用如何使用引擎。
+
+三个独立应用示例分别为 [平滑波](examples/standing_wave.py)、
+[水盆晃荡](examples/sloshing.py) 和 [绕岛](examples/island.py)。它们使用
+`swe.ModelBuilder` 建模，通过公开的 `swe.run()` 运行，可选择 CPU、CUDA
+和可视化，不依赖内置算例函数或 CLI。示例可复制到安装了引擎的其他项目。
+
+```sh
+.venv/bin/python examples/basic.py
+.venv/bin/python examples/sloshing.py --device cpu
+.venv/bin/python examples/sloshing.py --device cpu --viewer viser --speed 0.5 --loop --vertical-scale 5
+```
+
+安装、改参数和应用职责说明见 [examples/README.md](examples/README.md)。
+
 ## 本机直接运行
 
 项目已建立 `.venv`。在本目录运行：

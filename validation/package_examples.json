@@ -1,0 +1,234 @@
+{
+  "passed": true,
+  "purpose": "Standalone examples copied outside repository, run with Python isolated mode against a non-editable wheel in a NumPy-only environment.",
+  "python": "3.13.3",
+  "numpy": "2.5.3",
+  "package_import_path": "/private/tmp/swe_cpu_only/lib/python3.13/site-packages/swe/__init__.py",
+  "noneditable_install": {
+    "url": "file:///private/tmp/swe-package-examples-hfFBO3/dist/dut_swe_engine-0.1.0-py3-none-any.whl",
+    "archive_info": {}
+  },
+  "working_directory": "/private/tmp/swe-unrelated-cwd-d4v7w6xi",
+  "copied_examples_directory": "/private/tmp/swe-external-examples-jka1wkhe",
+  "wheel": "dut_swe_engine-0.1.0-py3-none-any.whl",
+  "wheel_sha256": "f41cd12654924192c8bc8ab013a7bed351a131256bfb3ae3f425c90a079382fe",
+  "build_command": [
+    "uv",
+    "build",
+    "--offline",
+    "--out-dir",
+    "/private/tmp/swe-package-examples-hfFBO3/dist"
+  ],
+  "install_command": [
+    "uv",
+    "--cache-dir",
+    "/private/tmp/swe-package-examples-hfFBO3/cache",
+    "pip",
+    "install",
+    "--offline",
+    "--python",
+    "/private/tmp/swe_cpu_only/bin/python",
+    "--no-deps",
+    "--reinstall",
+    "/private/tmp/swe-package-examples-hfFBO3/dist/dut_swe_engine-0.1.0-py3-none-any.whl"
+  ],
+  "sdist_examples": [
+    "dut_swe_engine-0.1.0/examples/README.md",
+    "dut_swe_engine-0.1.0/examples/basic.py",
+    "dut_swe_engine-0.1.0/examples/island.py",
+    "dut_swe_engine-0.1.0/examples/sloshing.py",
+    "dut_swe_engine-0.1.0/examples/standing_wave.py"
+  ],
+  "script_sha256": {
+    "README.md": "4bce3f1a663977200e79c044486a74cc5d1438a9bd3f345498da7e3b22690d12",
+    "basic.py": "86c3ac60f8bb14d9883bf5843b16efcf9c81b301f0202eb85ba99ad5410c579d",
+    "island.py": "941a962a24f0e6c82949e1073724513ad4601a66433787e3a5db8f24e2a895f9",
+    "sloshing.py": "a22dea4e8c8d1d2c8ebe76067d34f3e7098b9e1d8e7b800a196cde4ea7ffee5f",
+    "standing_wave.py": "0ea948d4ad66fe779a13bf8ce378d1b3a25e6e8460d74d3d38f793f5f3c741a2"
+  },
+  "optional_dependencies_present": {
+    "warp": false,
+    "pyvista": false,
+    "viser": false,
+    "scipy": false,
+    "pytest": false
+  },
+  "optional_dependencies_loaded_on_import": {
+    "warp": false,
+    "pyvista": false,
+    "viser": false,
+    "scipy": false,
+    "pytest": false
+  },
+  "packaged_island_mesh_shapes": {
+    "points": [
+      547,
+      2
+    ],
+    "triangles": [
+      1006,
+      3
+    ],
+    "fixed": [
+      547,
+      2
+    ]
+  },
+  "runs": [
+    {
+      "script": "/private/tmp/swe-external-examples-jka1wkhe/basic.py",
+      "arguments": [],
+      "command": [
+        "/private/tmp/swe_cpu_only/bin/python",
+        "-I",
+        "/private/tmp/swe-external-examples-jka1wkhe/basic.py"
+      ],
+      "exit_code": 0,
+      "simulation_time_s": 0.5000000000000003,
+      "steps_if_printed": null,
+      "wall_time_s": 0.092895,
+      "min_j": 0.9998779951558923,
+      "relative_volume_error": 0.0
+    },
+    {
+      "script": "/private/tmp/swe-external-examples-jka1wkhe/island.py",
+      "arguments": [
+        "--device",
+        "auto",
+        "--duration",
+        "0.05"
+      ],
+      "command": [
+        "/private/tmp/swe_cpu_only/bin/python",
+        "-I",
+        "/private/tmp/swe-external-examples-jka1wkhe/island.py",
+        "--device",
+        "auto",
+        "--duration",
+        "0.05"
+      ],
+      "exit_code": 0,
+      "simulation_time_s": 0.049999999999999996,
+      "steps_if_printed": 8,
+      "wall_time_s": 0.074642,
+      "min_j": 0.9951964157255226,
+      "relative_volume_error": 0.0
+    },
+    {
+      "script": "/private/tmp/swe-external-examples-jka1wkhe/sloshing.py",
+      "arguments": [
+        "--device",
+        "auto",
+        "--duration",
+        "0.05"
+      ],
+      "command": [
+        "/private/tmp/swe_cpu_only/bin/python",
+        "-I",
+        "/private/tmp/swe-external-examples-jka1wkhe/sloshing.py",
+        "--device",
+        "auto",
+        "--duration",
+        "0.05"
+      ],
+      "exit_code": 0,
+      "simulation_time_s": 0.05,
+      "steps_if_printed": null,
+      "wall_time_s": 0.067152,
+      "min_j": 0.9999999918757463,
+      "relative_volume_error": 0.0
+    },
+    {
+      "script": "/private/tmp/swe-external-examples-jka1wkhe/standing_wave.py",
+      "arguments": [
+        "--device",
+        "auto",
+        "--duration",
+        "0.05"
+      ],
+      "command": [
+        "/private/tmp/swe_cpu_only/bin/python",
+        "-I",
+        "/private/tmp/swe-external-examples-jka1wkhe/standing_wave.py",
+        "--device",
+        "auto",
+        "--duration",
+        "0.05"
+      ],
+      "exit_code": 0,
+      "simulation_time_s": 0.05,
+      "steps_if_printed": null,
+      "wall_time_s": 0.064096,
+      "min_j": 0.9999986002279018,
+      "relative_volume_error": 0.0
+    },
+    {
+      "script": "/private/tmp/swe-external-examples-jka1wkhe/standing_wave.py",
+      "arguments": [
+        "--device",
+        "cpu"
+      ],
+      "command": [
+        "/private/tmp/swe_cpu_only/bin/python",
+        "-I",
+        "/private/tmp/swe-external-examples-jka1wkhe/standing_wave.py",
+        "--device",
+        "cpu"
+      ],
+      "exit_code": 0,
+      "simulation_time_s": 6.385508568141009,
+      "steps_if_printed": null,
+      "wall_time_s": 0.266438,
+      "min_j": 0.999988347936302,
+      "relative_volume_error": 0.0
+    },
+    {
+      "script": "/private/tmp/swe-external-examples-jka1wkhe/island.py",
+      "arguments": [
+        "--device",
+        "cpu"
+      ],
+      "command": [
+        "/private/tmp/swe_cpu_only/bin/python",
+        "-I",
+        "/private/tmp/swe-external-examples-jka1wkhe/island.py",
+        "--device",
+        "cpu"
+      ],
+      "exit_code": 0,
+      "simulation_time_s": 9.9999999999997,
+      "steps_if_printed": 1600,
+      "wall_time_s": 1.230135,
+      "min_j": 0.4462117582584331,
+      "relative_volume_error": 0.0
+    },
+    {
+      "script": "/private/tmp/swe-external-examples-jka1wkhe/sloshing.py",
+      "arguments": [
+        "--device",
+        "cpu"
+      ],
+      "command": [
+        "/private/tmp/swe_cpu_only/bin/python",
+        "-I",
+        "/private/tmp/swe-external-examples-jka1wkhe/sloshing.py",
+        "--device",
+        "cpu"
+      ],
+      "exit_code": 0,
+      "simulation_time_s": 14.185033534428873,
+      "steps_if_printed": null,
+      "wall_time_s": 1.62825,
+      "min_j": 0.9975295998447148,
+      "relative_volume_error": 0.0
+    }
+  ],
+  "full_default_runs_total_wall_s": 3.124822,
+  "basic_checkpoint": {
+    "path": "/private/tmp/swe-unrelated-cwd-d4v7w6xi/outputs/basic_final.npz",
+    "time_s": 0.5000000000000003,
+    "steps": 100,
+    "restore_device": "cpu"
+  },
+  "auto_backend_reason": "CUDA optional dependency not installed; using CPU"
+}

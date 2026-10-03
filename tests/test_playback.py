@@ -1,11 +1,10 @@
 """Playback timing uses a fake clock: tests never sleep or need a GUI."""
 
 from concurrent.futures import Future
-from types import SimpleNamespace
 
 import pytest
 
-from swe import cli
+from swe import cli, runtime
 from swe.viewers import NullViewer
 
 
@@ -85,18 +84,18 @@ class Viewer(NullViewer):
 @pytest.fixture
 def playback(monkeypatch):
     clock = Clock()
-    monkeypatch.setattr(cli, "time", clock)
-    monkeypatch.setattr(cli, "ThreadPoolExecutor", ImmediateExecutor)
+    monkeypatch.setattr(runtime, "time", clock)
+    monkeypatch.setattr(runtime, "ThreadPoolExecutor", ImmediateExecutor)
 
     def run(*, speed=1.0, loop=False, paused=False, duration=1.0,
             dt=0.1, steps=None, on_poll=lambda viewer: None):
         model = Model()
         solver = Solver(clock)
         viewer = Viewer(clock, paused=paused, on_poll=on_poll)
-        args = SimpleNamespace(speed=speed, loop=loop, fps=25.0,
-                               steps=steps, hold=False)
-        result = cli._run_interactive(
-            model, solver, model.state(), model.state(), viewer, args, dt, duration,
+        monkeypatch.setattr(runtime, "DisplacementSolver", lambda model: solver)
+        result = runtime.run(
+            model, viewer=viewer, dt=dt, duration=duration, speed=speed,
+            loop=loop, fps=25.0, steps=steps,
         )
         return result, model, solver, viewer, clock
 
@@ -192,11 +191,12 @@ def test_playback_options_require_positive_finite_values(flag, value):
         cli.parser().parse_args([flag, value])
 
 
-def test_headless_stays_unpaced(playback):
+def test_headless_stays_unpaced(playback, monkeypatch):
     # This fixture installs the fake clock and executor without running a viewer.
     model = Model()
     clock = Clock()
     solver = Solver(clock)
-    result = cli._run_headless(model, solver, model.state(), model.state(), 0.1, 1.0, None)
+    monkeypatch.setattr(runtime, "DisplacementSolver", lambda model: solver)
+    result = runtime.run(model, dt=0.1, duration=1.0)
     assert result.time == pytest.approx(1.0)
     assert clock.now == 0.0
