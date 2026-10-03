@@ -67,6 +67,24 @@ GPU。默认 `auto` 在 CUDA 不可用时使用 CPU。示例所用数值模型�
 可随时在页面切换 **Show nodes** 和 **Wireframe**。面板显示当前顶点、单元数量。
 竖向放大只用于显示，和网格加密倍率分别控制。
 
+## 更高、更宽的入射波
+
+```sh
+.venv/bin/python examples/island_refined.py --device cpu --mesh-factor 10 --amplitude 0.064 --width-scale 5 --dt 0.00078125 --duration 8 --viewer viser --hide-nodes --wireframe --loop --speed 0.1 --vertical-scale 5
+```
+
+这组参数已完成 8 秒 CPU 检查：物理波峰高于静水面 6.4 cm，为原算例的两倍，
+静水位仍为 0.32 m；显示高度倍率仍为 5。每轮约 80 秒，实际速度受 CPU 算力限制。
+
+`--amplitude` 单位为米，设置初始波峰相对静水面的高度。
+`--width-scale` 控制同一振幅下脉冲的宽度，不改变峰值高度、峰值速度或波峰位置。
+由于基础波宽也随振幅变化，上述参数的实际波宽约为最初 3.2 cm 波的 **3.69 倍**。
+改变波形后会重新匹配初始岸线。波形和流速仍由初值驱动数值求解，并非播放解析动画。
+
+直接将原脉冲加高到 6.4 cm 会在约 3.86 秒出现单元翻转；加宽后选用上述配置，
+这次仅验证到 8 秒。记录见 [八秒验证](../validation/island_broader_wave_5x.json)
+和 [未加宽的高波测试](../validation/island_higher_wave.json)。
+
 ## 应用与引擎各自负责什么
 
 应用负责：重力、网格、地形、水面与速度初值、设备、时间步长、模拟时长。

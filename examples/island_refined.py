@@ -12,6 +12,12 @@ MATLAB island benchmark. Integer mesh factors count triangles, not points
 along each coordinate axis. Extra interior splits retain a conforming mesh;
 boundary resolution follows the preceding uniform 1-to-4 refinement level.
 This example defines its scene itself, without internal benchmark factories.
+The amplitude is the physical initial crest height above the 0.32 m still-water
+level. Larger waves can shorten the usable time before shoreline elements
+compress; the automatic time step is a starting value, not a stability guarantee.
+The width scale broadens the initial pulse while preserving its crest position
+and crest velocity. A broadened pulse is a prescribed initial condition, not
+an exact solitary-wave solution of these nondispersive equations.
 """
 
 from __future__ import annotations
@@ -100,7 +106,8 @@ def _refine_interior_to(mesh, target):
     return mesh
 
 
-def build_model(device="auto", gravity=9.81, mesh_factor=1):
+def build_model(device="auto", gravity=9.81, mesh_factor=1, amplitude=0.032,
+                width_scale=1.0):
     """Build an integer multiple of the original triangle count.
 
     Uniform 1-to-4 subdivision is followed by conforming interior bisection
@@ -109,6 +116,12 @@ def build_model(device="auto", gravity=9.81, mesh_factor=1):
     gravity = float(gravity)
     if not math.isfinite(gravity) or gravity <= 0:
         raise ValueError("gravity must be finite and positive")
+    amplitude = float(amplitude)
+    if not math.isfinite(amplitude) or amplitude <= 0:
+        raise ValueError("amplitude must be finite and positive")
+    width_scale = float(width_scale)
+    if not math.isfinite(width_scale) or width_scale <= 0:
+        raise ValueError("width_scale must be finite and positive")
     if isinstance(mesh_factor, bool) or not isinstance(mesh_factor, int) or mesh_factor < 1:
         raise ValueError("mesh_factor must be a positive integer")
 
@@ -122,9 +135,10 @@ def build_model(device="auto", gravity=9.81, mesh_factor=1):
 
     # Bed elevations and surface heights are in metres, measured from z = 0.
     bottom = swe.GaussianBottom(height=0.875, center=(12.5, 15.0), sigma=1.6)
-    mean_height, amplitude = 0.32, 0.032
-    k = np.sqrt(3 * amplitude / (4 * mean_height**2 * (mean_height + amplitude)))
-    wave_center = 5 / k
+    mean_height = 0.32
+    base_k = np.sqrt(3 * amplitude / (4 * mean_height**2 * (mean_height + amplitude)))
+    k = base_k / width_scale
+    wave_center = 5 / base_k
     c = np.sqrt(gravity * (mean_height + amplitude))
 
     def profile(xy):
@@ -135,10 +149,14 @@ def build_model(device="auto", gravity=9.81, mesh_factor=1):
 
     def initial_velocity(xy):
         velocity = np.zeros_like(xy, dtype=float)
-        velocity[:, 0] = c * k * np.sqrt(4 * mean_height * amplitude / 3) * profile(xy)
+        velocity[:, 0] = c * base_k * np.sqrt(4 * mean_height * amplitude / 3) * profile(xy)
         return velocity
 
     target = original_triangles * mesh_factor
+    # The reference coast was fitted to the original pulse. A changed pulse
+    # needs its own initially wet boundary, including on the unrefined mesh.
+    if amplitude != 0.032 or width_scale != 1.0:
+        mesh = _project_shoreline(mesh, bottom, initial_surface)
     while 4 * len(mesh.triangles) <= target:
         mesh = _project_shoreline(mesh.refined(), bottom, initial_surface)
     mesh = _refine_interior_to(mesh, target)
@@ -152,12 +170,15 @@ def build_model(device="auto", gravity=9.81, mesh_factor=1):
     )
     model = builder.finalize(device=device)
     time_scale = np.sqrt(9.81 / gravity)
+    wave_speed_scale = np.sqrt((mean_height + 0.032) / (mean_height + amplitude))
     step_divisor = 2 ** math.ceil(math.log2(math.sqrt(mesh_factor)))
     return model, {
-        "dt": 0.00625 / step_divisor * time_scale,
+        "dt": 0.00625 / step_divisor * time_scale * wave_speed_scale,
         "duration": (10.0 if mesh_factor == 1 else 3.0) * time_scale,
         "mesh_factor": mesh_factor, "nodes": len(mesh.points),
         "triangles": len(mesh.triangles), "original_triangles": original_triangles,
+        "amplitude": amplitude, "mean_height": mean_height,
+        "width_scale": width_scale, "wave_center": wave_center,
     }
 
 
@@ -182,6 +203,10 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
     parser.add_argument("--gravity", type=positive, default=9.81, help="gravity in m/s²")
+    parser.add_argument("--amplitude", type=positive, default=0.032,
+                        help="initial crest height in metres above the 0.32 m still-water level")
+    parser.add_argument("--width-scale", type=positive, default=1.0,
+                        help="initial pulse width multiplier; keeps crest position and velocity")
     parser.add_argument("--mesh-factor", type=positive_integer, default=1,
                         help="integer multiple of the original 1006 triangles")
     parser.add_argument("--viewer", choices=("none", "viser", "pyvista"), default="none")
@@ -203,7 +228,8 @@ def main(argv=None):
     viewer = None
     try:
         model, settings = build_model(device=args.device, gravity=args.gravity,
-                                      mesh_factor=args.mesh_factor)
+                                      mesh_factor=args.mesh_factor, amplitude=args.amplitude,
+                                      width_scale=args.width_scale)
         dt = args.dt if args.dt is not None else settings["dt"]
         duration = args.duration if args.duration is not None else settings["duration"]
         if args.viewer != "none":
@@ -215,10 +241,20 @@ def main(argv=None):
                 show_nodes=not args.hide_nodes, wireframe=args.wireframe,
             )
             if args.viewer == "viser":
+                viewer.server.gui.add_markdown(
+                    f"**Initial wave / playback**\n\n"
+                    f"- Crest above still water: **{100 * args.amplitude:g} cm**\n"
+                    f"- Pulse width scale: **{args.width_scale:g}×**\n"
+                    f"- Simulation interval: **0–{duration:g} s**\n"
+                    f"- Playback speed: **{args.speed:g}×**\n"
+                    f"- Physics dt: `{dt:g}` s"
+                )
                 print(f"Browser viewer: {viewer.url}", flush=True)
 
         print(f"Island: {settings['nodes']} nodes, {settings['triangles']} triangles "
-              f"({args.mesh_factor}× original), dt={dt:g} s, duration={duration:g} s", flush=True)
+              f"({args.mesh_factor}× original), amplitude={args.amplitude:g} m, "
+              f"width scale={args.width_scale:g}, "
+              f"dt={dt:g} s, duration={duration:g} s", flush=True)
         state = swe.run(
             model, dt=dt, duration=duration, viewer=viewer,
             speed=args.speed, loop=args.loop, hold=args.hold,
