@@ -174,7 +174,7 @@ class PyVistaViewer(NullViewer):
     def __init__(
         self, model: Any, *, field: str = "eta", paused: bool = False,
         off_screen: bool = False, clim: tuple[float, float] | None = None,
-        vertical_scale: float = 1.0,
+        vertical_scale: float = 1.0, wireframe: bool = False,
         **_: Any,
     ):
         super().__init__(paused=paused)
@@ -196,7 +196,7 @@ class PyVistaViewer(NullViewer):
         self._mesh = None
         self._actor = None
         self._shown = False
-        self._wireframe = False
+        self._wireframe = bool(wireframe)
         self._faces = np.column_stack(
             (np.full(len(model.triangles), 3), model.triangles)
         ).ravel()
@@ -210,7 +210,7 @@ class PyVistaViewer(NullViewer):
         self.plotter.add_axes()
         self.plotter.add_text(
             "Space: pause  N: step  R: reset  1/2/3: eta/depth/speed\n"
-            "W: mesh edges  T: top view  I: 3D view  Q: quit",
+            "W: wireframe  T: top view  I: 3D view  Q: quit",
             position="lower_left", font_size=10, color="#202b35",
         )
         for key in ("space",):
@@ -236,7 +236,7 @@ class PyVistaViewer(NullViewer):
     def _toggle_edges(self) -> None:
         self._wireframe = not self._wireframe
         if self._actor is not None:
-            self._actor.prop.show_edges = self._wireframe
+            self._actor.prop.style = "wireframe" if self._wireframe else "surface"
 
     def update(self, snapshot: dict, diagnostics: dict) -> None:
         if not self.is_running:
@@ -256,6 +256,7 @@ class PyVistaViewer(NullViewer):
                       _colors(np.linspace(0.0, 1.0, 256), (0.0, 1.0))],
                 scalar_bar_args={"title": "Field value"},
                 show_edges=False, edge_color="#526979",
+                style="wireframe" if self._wireframe else "surface",
             )
             self.plotter.view_isometric()
             self.plotter.reset_camera()
@@ -310,7 +311,8 @@ class ViserViewer(NullViewer):
         self, model: Any, *, field: str = "eta", paused: bool = False,
         host: str = "127.0.0.1", port: int = 8080,
         clim: tuple[float, float] | None = None,
-        vertical_scale: float = 1.0, **_: Any,
+        vertical_scale: float = 1.0, show_nodes: bool = True,
+        wireframe: bool = False, **_: Any,
     ):
         super().__init__(paused=paused)
         if field not in FIELDS:
@@ -332,7 +334,8 @@ class ViserViewer(NullViewer):
         self.server.scene.set_up_direction("+z")
         self._field = self.server.gui.add_dropdown("Nodal color", options=FIELDS, initial_value=field)
         self._pause_control = self.server.gui.add_checkbox("Paused", initial_value=paused)
-        self._edges_control = self.server.gui.add_checkbox("Wireframe", initial_value=False)
+        self._nodes_control = self.server.gui.add_checkbox("Show nodes", initial_value=show_nodes)
+        self._edges_control = self.server.gui.add_checkbox("Wireframe", initial_value=wireframe)
         step_button = self.server.gui.add_button("Single step")
         reset_button = self.server.gui.add_button("Reset")
         stop_button = self.server.gui.add_button("Stop server")
@@ -367,6 +370,9 @@ class ViserViewer(NullViewer):
             self._pause_control.value = self.paused
         if self._mesh is not None:
             self._mesh.wireframe = self._edges_control.value
+        if self._nodes is not None:
+            self._nodes.visible = self._nodes_control.value
+        self._field.disabled = not self._nodes_control.value
 
     def update(self, snapshot: dict, diagnostics: dict) -> None:
         if not self.is_running:
@@ -385,10 +391,12 @@ class ViserViewer(NullViewer):
                 self._mesh = self.server.scene.add_mesh_simple(
                     "/water", vertices=vertices, faces=self._faces, color=(72, 142, 172),
                     side="double", cast_shadow=False, receive_shadow=False,
+                    wireframe=self._edges_control.value,
                 )
                 self._nodes = self.server.scene.add_point_cloud(
                     "/nodal_field", points=nodal_vertices, colors=colors,
                     point_size=0.006 * self._span, point_shape="circle",
+                    visible=self._nodes_control.value,
                 )
             else:
                 self._mesh.vertices = vertices
@@ -401,9 +409,11 @@ class ViserViewer(NullViewer):
                 f"- Minimum depth: {diagnostics.get('min_depth', float('nan')):.4g} m\n"
                 f"- Maximum speed: {diagnostics.get('max_speed', float('nan')):.4g} m/s\n"
                 f"- Volume: {diagnostics.get('volume', float('nan')):.6g} m³\n\n"
+                f"Mesh: **{len(vertices):,} vertices / {len(self._faces):,} triangles**\n\n"
                 f"Vertical scale: **{self._vertical_scale:g}×** (display only; values below are physical).\n\n"
-                f"**{FIELD_LABELS[field]} at nodes** — fixed blue → yellow range: "
-                f"`{limits[0]:.4g}` → `{limits[1]:.4g}`. Values outside this range clip in color."
+                + (f"**{FIELD_LABELS[field]} at nodes** — fixed blue → yellow range: "
+                   f"`{limits[0]:.4g}` → `{limits[1]:.4g}`. Values outside this range clip in color."
+                   if self._nodes_control.value else "Node markers hidden; mesh geometry only.")
             )
         self.poll()
         self.server.flush()

@@ -9,7 +9,8 @@
 | [basic.py](basic.py) | 最小 `import swe` → 建模 → `solver.step()` → 读取结果；自己控制时间循环 |
 | [standing_wave.py](standing_wave.py) | 矩形水槽、平底和用户给定的初始水面函数 |
 | [sloshing.py](sloshing.py) | 自定义三角形网格、抛物面水底、倾斜初始水面和可选动画 |
-| [island.py](island.py) | 原 MATLAB 绕岛网格、高斯岛屿和入射脉冲，原始 1006 单元 |
+| [island.py](island.py) | 原 MATLAB 绕岛网格、高斯岛屿和入射脉冲，1006 单元 |
+| [island_refined.py](island_refined.py) | 绕岛网格按单元总数加密，可关闭节点、显示三角形线框 |
 
 `src/swe/cases.py` 保留内置基准用于 CLI 和数值回归。这里的示例把相应场景
 定义展开在应用中，不调用 `swe.cases` 或 `swe.cli`。绕岛示例通过标准
@@ -47,6 +48,24 @@ python -m pip install -e '.[web]'   # 如需网页动画
 切换 CUDA 只需 `--device cuda`；需要安装引擎的 `cuda` 可选依赖和 NVIDIA
 GPU。默认 `auto` 在 CUDA 不可用时使用 CPU。示例所用数值模型仍是非色散、
 深度平均的位移浅水方程，模型适用范围和稳定性限制见主 README。
+
+## 绕岛网格加密和线框显示
+
+```sh
+.venv/bin/python examples/island_refined.py --device cpu --mesh-factor 10 --viewer viser --hide-nodes --wireframe --loop --speed 0.2 --vertical-scale 5 --duration 4
+```
+
+`--mesh-factor 10` 将原始 1006 个三角形增加到 **10,060 个**，倍率指单元总数。
+采用均匀四分细化，再成对二分域内长边，保持网格连续；岸线投影到初始零水深
+等高线，并保持均匀细化后的边界分辨率。因此这不是每条边等比例细分。
+10 倍加密后默认时间步为 0.0015625 秒，默认模拟 0–3 秒；此配置已通过 CPU
+0–4.5 秒检查，上述命令播放 0–4 秒。检查结果见
+[验证记录](../validation/island_tenfold_cpu.json)。这不代表任意长时稳定，当前方法
+在岸边强压缩时仍可能发生单元畸变。
+
+`--hide-nodes` 关闭浏览器中的节点标记，`--wireframe` 只画水面三角形边线。
+可随时在页面切换 **Show nodes** 和 **Wireframe**。面板显示当前顶点、单元数量。
+竖向放大只用于显示，和网格加密倍率分别控制。
 
 ## 应用与引擎各自负责什么
 

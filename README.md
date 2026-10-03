@@ -22,6 +22,7 @@ Hammer 积分、集中质量和显式 Verlet 推进。水底高程向上为正�
 .venv/bin/python examples/basic.py
 .venv/bin/python examples/sloshing.py --device cpu
 .venv/bin/python examples/sloshing.py --device cpu --viewer viser --speed 0.5 --loop --vertical-scale 5
+.venv/bin/python examples/island_refined.py --device cpu --mesh-factor 10 --viewer viser --hide-nodes --wireframe --loop --speed 0.2 --vertical-scale 5 --duration 4
 ```
 
 安装、改参数和应用职责说明见 [examples/README.md](examples/README.md)。
@@ -49,8 +50,9 @@ Hammer 积分、集中质量和显式 Verlet 推进。水底高程向上为正�
 ```
 
 桌面快捷键：空格暂停/继续，`n` 单步，`r` 重置，`1/2/3` 切换水面/水深/速度，
-`w` 网格边，`t` 俯视，`i` 三维视角，`q` 退出。浏览器使用侧边控件。
+`w` 线框，`t` 俯视，`i` 三维视角，`q` 退出。浏览器使用侧边控件。
 浏览器中的标量采用**节点颜色**叠加简单水面，桌面窗口提供连续的顶点颜色插值。
+浏览器可关闭 **Show nodes** 隐藏节点标记，并开启 **Wireframe** 查看水面三角网格。
 底形显示使用独立的稀疏采样网格，展示干岛；该显示网格不参与数值求解。
 
 交互查看器默认按真实时间播放；`--speed 0.5` 是半速，`--speed 2` 是两倍速。
