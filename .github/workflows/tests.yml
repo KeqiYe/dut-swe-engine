@@ -1,0 +1,40 @@
+name: CPU tests and package
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cpu:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.10', '3.13']
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install development dependencies
+        run: python -m pip install -e '.[dev]' build
+      - name: Run CPU and Warp CPU regression tests
+        run: python -m pytest -q
+      - name: Build distribution
+        run: python -m build
+      - name: Smoke test installed wheel without optional dependencies
+        shell: bash
+        run: |
+          python -m venv "$RUNNER_TEMP/swe-wheel"
+          "$RUNNER_TEMP/swe-wheel/bin/python" -m pip install dist/*.whl
+          "$RUNNER_TEMP/swe-wheel/bin/python" -I examples/basic.py
+          "$RUNNER_TEMP/swe-wheel/bin/python" -I examples/standing_wave.py --device cpu --duration 0.01
+          "$RUNNER_TEMP/swe-wheel/bin/python" -I examples/sloshing.py --device cpu --duration 0.01
+          "$RUNNER_TEMP/swe-wheel/bin/python" -I examples/island.py --device cpu --duration 0.01
+          "$RUNNER_TEMP/swe-wheel/bin/python" -I examples/island_refined.py --device cpu --mesh-factor 10 --duration 0.01

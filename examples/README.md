@@ -18,26 +18,26 @@
 
 ## 安装和运行
 
-在项目根目录安装一次（开发本引擎时用 `-e`）：
+按[主 README](../README.md#快速开始) 下载项目、建立并激活虚拟环境，然后在项目根目录安装（开发本引擎时用 `-e`）：
 
 ```sh
 python -m pip install -e .          # CPU 只需要 NumPy
 python -m pip install -e '.[web]'   # 如需网页动画
 ```
 
-本项目现有虚拟环境已经安装好了，可以直接运行：
+安装后运行：
 
 ```sh
-.venv/bin/python examples/basic.py
-.venv/bin/python examples/standing_wave.py --device cpu
-.venv/bin/python examples/sloshing.py --device cpu
-.venv/bin/python examples/island.py --device cpu
+python examples/basic.py
+python examples/standing_wave.py --device cpu
+python examples/sloshing.py --device cpu
+python examples/island.py --device cpu
 ```
 
 无界面示例运行完自动退出。动画需显式开启：
 
 ```sh
-.venv/bin/python examples/sloshing.py --device cpu --viewer viser --speed 0.5 --loop --vertical-scale 5
+python examples/sloshing.py --device cpu --viewer viser --speed 0.5 --loop --vertical-scale 5
 ```
 
 打开 `http://127.0.0.1:8080`。`Stop server` 或终端 Ctrl+C 关闭；
@@ -52,7 +52,7 @@ GPU。默认 `auto` 在 CUDA 不可用时使用 CPU。示例所用数值模型�
 ## 绕岛网格加密和线框显示
 
 ```sh
-.venv/bin/python examples/island_refined.py --device cpu --mesh-factor 10 --viewer viser --hide-nodes --wireframe --loop --speed 0.2 --vertical-scale 5 --duration 4
+python examples/island_refined.py --device cpu --mesh-factor 10 --viewer viser --hide-nodes --wireframe --loop --speed 0.2 --vertical-scale 5 --duration 4
 ```
 
 `--mesh-factor 10` 将原始 1006 个三角形增加到 **10,060 个**，倍率指单元总数。
@@ -70,7 +70,7 @@ GPU。默认 `auto` 在 CUDA 不可用时使用 CPU。示例所用数值模型�
 ## 更高、更宽的入射波
 
 ```sh
-.venv/bin/python examples/island_refined.py --device cpu --mesh-factor 10 --amplitude 0.064 --width-scale 5 --dt 0.00078125 --duration 8 --viewer viser --hide-nodes --wireframe --loop --speed 0.1 --vertical-scale 5
+python examples/island_refined.py --device cpu --mesh-factor 10 --amplitude 0.064 --width-scale 5 --dt 0.00078125 --duration 8 --viewer viser --hide-nodes --wireframe --loop --speed 0.1 --vertical-scale 5
 ```
 
 这组参数已完成 8 秒 CPU 检查：物理波峰高于静水面 6.4 cm，为原算例的两倍，
@@ -113,5 +113,5 @@ snapshot = state.to_numpy()
 并在 `finally` 中关闭它。引擎运行入口接收任何应用构建的模型，不绑定内置算例名。
 循环播放每次都从初态重新计算，并不是把多个周期连续积分。
 
-在其他项目使用时，安装引擎 wheel 或 `python -m pip install /path/to/swe_engine`，
+在其他项目使用时，安装引擎 wheel 或 `python -m pip install /path/to/dut-swe-engine`，
 复制所需示例即可。源码发行包也包含本目录，wheel 中包含引擎和绕岛网格资源。

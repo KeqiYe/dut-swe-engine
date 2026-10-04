@@ -1,5 +1,9 @@
 # 首版验证记录 · 2026-10-03
 
+公开发布前复核（2026-10-04）：当前本地 Python 3.13 / NumPy + Warp CPU
+测试共 **147 passed，22 skipped**；跳过项需要 NVIDIA CUDA 设备。
+下文 CUDA、性能和图形结果为 2026-10-03 的实测记录，不代表本次重新执行。
+
 Python/NumPy 与实际 NVIDIA CUDA 后端均已运行。原始绕岛网格的 MATLAB 10 秒
 对照通过，平滑波与解析晃荡通过独立参考验证，约 5 万单元的完整周期计算通过。
 
@@ -10,7 +14,7 @@ Python/NumPy 与实际 NVIDIA CUDA 后端均已运行。原始绕岛网格的 MA
 ## 环境与自动测试
 
 - 本地：macOS ARM64，Python 3.13.3，NumPy 2.5.3，Warp 1.17.0。
-- delltower：Linux x86_64，Python 3.12.3，RTX 4090，驱动 595.71.05，Warp 1.17.0。
+- GPU 验证机：Linux x86_64，Python 3.12.3，RTX 4090，驱动 595.71.05，Warp 1.17.0。
 - 本地测试：71 passed，22 个 CUDA 条件测试跳过，见 `cpu_pytest.log`。
 - CUDA 实机测试：92 passed，1 个“CUDA 不可用”条件测试跳过，见 `cuda_pytest.log`。
 - 仅安装 NumPy 的独立环境可使用 `device="auto"` 回退 CPU，见 `cpu_only_smoke.json`。

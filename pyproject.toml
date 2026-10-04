@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,8 +7,16 @@ name = "dut-swe-engine"
 version = "0.1.0"
 description = "Displacement shallow-water engine with NumPy and CUDA backends"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE.md"]
+authors = [{name = "KeqiYe"}]
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24"]
+keywords = ["shallow-water", "finite-element", "cuda", "simulation"]
+
+[project.urls]
+Repository = "https://github.com/KeqiYe/dut-swe-engine"
+Issues = "https://github.com/KeqiYe/dut-swe-engine/issues"
 
 [project.optional-dependencies]
 cuda = ["warp-lang==1.17.0"]

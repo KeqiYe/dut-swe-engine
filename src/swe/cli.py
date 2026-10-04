@@ -98,8 +98,8 @@ def main(argv: list[str] | None = None) -> int:
                   f"display vertical scale={args.vertical_scale:g}", flush=True)
         if args.viewer == "viser":
             print(f"Browser viewer: {viewer.url}\n"
-                  f"For delltower: ssh -N -L {viewer.server.get_port()}:127.0.0.1:"
-                  f"{viewer.server.get_port()} delltower", flush=True)
+                  f"For a remote host: ssh -N -L {viewer.server.get_port()}:127.0.0.1:"
+                  f"{viewer.server.get_port()} user@gpu-host", flush=True)
         state = run(
             model, dt=dt, duration=duration,
             viewer=viewer if args.viewer != "none" else None,

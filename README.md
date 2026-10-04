@@ -1,11 +1,47 @@
 # SWE：位移法浅水动力学引擎
 
-Python 接口，NumPy CPU 基准后端和 NVIDIA Warp CUDA 后端。移植自相邻目录
-`../swe3d_minimal` 的已验证 MATLAB 核心，采用水平拉格朗日三角形网格、三点
-Hammer 积分、集中质量和显式 Verlet 推进。水底高程向上为正，使用 SI 单位。
+A Python displacement-based shallow-water engine with a NumPy CPU backend and optional NVIDIA Warp CUDA acceleration.
+
+`dut-swe-engine` 是可通过 `import swe` 使用的 Python 包，CPU 核心只依赖 NumPy，
+CUDA 加速和实时查看器均为可选依赖。数值核心由 MATLAB 基准实现移植，采用水平
+拉格朗日三角形网格、三点 Hammer 积分、集中质量和显式 Verlet 推进。
+水底高程向上为正，使用 SI 单位。
 
 这是**非色散、深度平均浅水模型**；三维显示由水平位置、水深和地形重建，
-没有独立求解竖向速度。版本控制在本目录的 `.git` 中，原 MATLAB 和论文未修改。
+没有独立求解竖向速度。当前仍是研究用实现，适用范围与已知稳定性限制见下文。
+本仓库包含 Python 引擎、示例、测试及生成的基准数据，不包含原 MATLAB 程序或论文 PDF。
+
+## 快速开始
+
+推荐 Python 3.12 或 3.13。先下载项目并建立虚拟环境：
+
+```sh
+git clone https://github.com/KeqiYe/dut-swe-engine.git
+cd dut-swe-engine
+python -m venv .venv
+```
+
+macOS / Linux 激活环境（创建环境时也可使用 `python3`）：
+
+```sh
+source .venv/bin/activate
+```
+
+Windows PowerShell 激活环境：
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+随后安装引擎及浏览器查看器，并运行 CPU 绕岛示例：
+
+```sh
+python -m pip install -e '.[web]'
+python examples/island.py --device cpu --viewer viser --speed 0.5 --loop
+```
+
+打开 [http://127.0.0.1:8080](http://127.0.0.1:8080) 查看动画，终端按 Ctrl+C 停止。
+只需无界面计算时安装 `python -m pip install -e .` 即可；下文命令均假定虚拟环境已激活。
 
 ## 作为包导入到自己的程序
 
@@ -19,34 +55,34 @@ Hammer 积分、集中质量和显式 Verlet 推进。水底高程向上为正�
 和可视化，不依赖内置算例函数或 CLI。示例可复制到安装了引擎的其他项目。
 
 ```sh
-.venv/bin/python examples/basic.py
-.venv/bin/python examples/sloshing.py --device cpu
-.venv/bin/python examples/sloshing.py --device cpu --viewer viser --speed 0.5 --loop --vertical-scale 5
-.venv/bin/python examples/island_refined.py --device cpu --mesh-factor 10 --viewer viser --hide-nodes --wireframe --loop --speed 0.2 --vertical-scale 5 --duration 4
+python examples/basic.py
+python examples/sloshing.py --device cpu
+python examples/sloshing.py --device cpu --viewer viser --speed 0.5 --loop --vertical-scale 5
+python examples/island_refined.py --device cpu --mesh-factor 10 --viewer viser --hide-nodes --wireframe --loop --speed 0.2 --vertical-scale 5 --duration 4
 ```
 
 安装、改参数和应用职责说明见 [examples/README.md](examples/README.md)。
 
-## 本机直接运行
+## 命令行与实时查看
 
-项目已建立 `.venv`。在本目录运行：
+安装所需的可选查看器后，在项目根目录运行：
 
 ```sh
 # 原绕岛算例，CPU，无界面
-.venv/bin/swe --case island --device cpu
+swe --case island --device cpu
 
 # 简单桌面窗口；计算结束后保留窗口
-.venv/bin/swe --case island --viewer pyvista --hold
+swe --case island --viewer pyvista --hold
 
 # 平滑驻波、抛物面水盆晃荡
-.venv/bin/swe --case wave --viewer pyvista --hold
-.venv/bin/swe --case sloshing --viewer pyvista --hold
+swe --case wave --viewer pyvista --hold
+swe --case sloshing --viewer pyvista --hold
 
 # 浏览器查看；在本地打开 http://127.0.0.1:8080
-.venv/bin/swe --case island --viewer viser --paused --hold
+swe --case island --viewer viser --paused --hold
 
 # CPU 晃荡动画：半速循环，竖向显示放大 5 倍
-.venv/bin/swe --case sloshing --device cpu --viewer viser --speed 0.5 --loop --vertical-scale 5
+swe --case sloshing --device cpu --viewer viser --speed 0.5 --loop --vertical-scale 5
 ```
 
 桌面快捷键：空格暂停/继续，`n` 单步，`r` 重置，`1/2/3` 切换水面/水深/速度，
@@ -68,11 +104,10 @@ Hammer 积分、集中质量和显式 Verlet 推进。水底高程向上为正�
 推荐 Python 3.12 或 3.13。CPU 核心只依赖 NumPy，图形与 CUDA 都是可选依赖。
 
 ```sh
-python3 -m venv .venv
-.venv/bin/python -m pip install -e .                 # CPU
-.venv/bin/python -m pip install -e '.[cuda]'          # NVIDIA CUDA + Warp CPU
-.venv/bin/python -m pip install -e '.[desktop,web]'   # 可选查看器
-.venv/bin/python -m pip install -e '.[dev]'           # 回归测试
+python -m pip install -e .                 # CPU
+python -m pip install -e '.[cuda]'          # NVIDIA CUDA + Warp CPU
+python -m pip install -e '.[desktop,web]'   # 可选查看器
+python -m pip install -e '.[dev]'           # 回归测试
 ```
 
 项目同时提供 `uv.lock`；使用 uv 时可运行 `uv sync --extra dev --extra desktop --extra web`。
@@ -177,9 +212,9 @@ solver.advance(state, duration=0.1, max_dt=0.001, adaptive=True)
 ## 验证与性能
 
 ```sh
-.venv/bin/python -m pytest -q
-.venv/bin/python validation/run_validation.py --device cpu --output validation/cpu_results.json
-.venv/bin/python validation/run_validation.py --device cuda --scale --output validation/cuda_results.json
+python -m pytest -q
+python validation/run_validation.py --device cpu --output validation/cpu_results.json
+python validation/run_validation.py --device cuda --scale --output validation/cuda_results.json
 ```
 
 验收包含 MATLAB 10 秒对照、平底静水、线性小振幅驻波、抛物面水盆解析晃荡、
@@ -198,22 +233,33 @@ solver.advance(state, duration=0.1, max_dt=0.001, adaptive=True)
 刚体耦合或自动微分。数学方法参考
 [Wu & Zhong (2017), CMAME 318, 431–455](https://doi.org/10.1016/j.cma.2017.01.040)。
 
-## delltower 远程查看
+## GPU 服务器远程查看
 
-独立验证副本位于 delltower 的 `~/swe_engine_validation`，不改动原硬盘资料。
-若在该副本启动浏览器服务：
-
-```sh
-cd ~/swe_engine_validation
-PYTHONPATH=src .venv/bin/python -m swe --case island --device cuda --viewer viser --paused --hold
-```
-
-该验证副本已安装可选的 `viser` 依赖。新环境安装时使用 `pip install -e '.[cuda,web]'`。
-然后在 Mac 建立隧道：
+在装有 NVIDIA GPU 的服务器上克隆项目到 `~/dut-swe-engine`，建立并激活虚拟环境，
+安装 CUDA 与浏览器可选依赖后运行：
 
 ```sh
-ssh -N -L 8080:127.0.0.1:8080 delltower
+cd ~/dut-swe-engine
+python -m pip install -e '.[cuda,web]'
+swe --case island --device cuda --viewer viser --paused --hold
 ```
 
-打开本地 `http://127.0.0.1:8080`。服务默认仅监听环回地址；查看器可完全关闭，
-服务器无需桌面环境。当前远程目录为测试副本，本地 Git 仓库是开发源。
+在本机建立 SSH 隧道，将 `gpu-host` 替换为服务器的 SSH 地址或别名：
+
+```sh
+ssh -N -L 8080:127.0.0.1:8080 gpu-host
+```
+
+打开本地 [http://127.0.0.1:8080](http://127.0.0.1:8080)。服务默认仅监听环回地址；
+查看器可完全关闭，服务器无需桌面环境。
+
+## 许可证与来源
+
+本项目按 [MIT License](LICENSE) 发布；代码和基准数据的来源说明见 [NOTICE.md](NOTICE.md)。
+数学方法参考 Feng Wu 与 Wanxie Zhong 的论文：
+
+> Wu, F., & Zhong, W. (2017). On displacement shallow water wave equation and
+> symplectic solution. *Computer Methods in Applied Mechanics and Engineering*,
+> 318, 431–455. [doi:10.1016/j.cma.2017.01.040](https://doi.org/10.1016/j.cma.2017.01.040).
+
+方法引用不表示论文作者为本实现背书；本仓库的许可证不授予原 MATLAB 程序或论文的权利。
