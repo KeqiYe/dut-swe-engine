@@ -3,8 +3,9 @@
 A Python displacement-based shallow-water engine with a NumPy CPU backend and optional NVIDIA Warp CUDA acceleration.
 
 `dut-swe-engine` 是可通过 `import swe` 使用的 Python 包，CPU 核心只依赖 NumPy，
-CUDA 加速和实时查看器均为可选依赖。数值核心由 MATLAB 基准实现移植，采用水平
-拉格朗日三角形网格、三点 Hammer 积分、集中质量和显式 Verlet 推进。
+CUDA 加速和实时查看器均为可选依赖。原 MATLAB 源代码由 **Keqi Ye（KeqiYe）**
+在硕士研究期间编写；本项目将其数值核心移植为 Python，并提供 CPU/CUDA 后端。
+求解器采用水平拉格朗日三角形网格、三点 Hammer 积分、集中质量和显式 Verlet 推进。
 水底高程向上为正，使用 SI 单位。
 
 这是**非色散、深度平均浅水模型**；三维显示由水平位置、水深和地形重建，
@@ -256,10 +257,24 @@ ssh -N -L 8080:127.0.0.1:8080 gpu-host
 ## 许可证与来源
 
 本项目按 [MIT License](LICENSE) 发布；代码和基准数据的来源说明见 [NOTICE.md](NOTICE.md)。
-数学方法参考 Feng Wu 与 Wanxie Zhong 的论文：
+原 MATLAB 源代码作者为 **Keqi Ye（KeqiYe）**。数学方法参考 Feng Wu 与
+Wanxie Zhong 的论文：
 
 > Wu, F., & Zhong, W. (2017). On displacement shallow water wave equation and
 > symplectic solution. *Computer Methods in Applied Mechanics and Engineering*,
 > 318, 431–455. [doi:10.1016/j.cma.2017.01.040](https://doi.org/10.1016/j.cma.2017.01.040).
+
+作者关于位移浅水波数值振荡抑制的相关研究：
+
+> Ye, K., Zhao, Y., Wu, F., & Zhong, W. (2022). An adaptive artificial viscosity
+> for the displacement shallow water wave equation. *Applied Mathematics and
+> Mechanics*, 43(2), 247–262.
+> [doi:10.1007/s10483-022-2815-7](https://doi.org/10.1007/s10483-022-2815-7).
+
+该文提出自适应人工黏性（AAV）以抑制数值振荡，与本项目后续的激波处理扩展直接
+相关。**当前版本尚未实现该文的 AAV**；现有 `manning` 参数控制底摩阻，默认
+为零，不能替代 AAV。引用该文不表示当前绕岛程序已经具备其激波或湿干界面处理能力。
+使用基础位移法时引用 Wu & Zhong (2017)；讨论或采用 AAV 时引用 Ye et al. (2022)。
+完整 BibTeX 见 [references.bib](references.bib)。
 
 方法引用不表示论文作者为本实现背书；本仓库的许可证不授予原 MATLAB 程序或论文的权利。

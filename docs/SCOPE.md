@@ -5,7 +5,7 @@ bathymetry, triangular mesh, initial surface/velocity and dt. Validate island,
 smooth waves and sloshing; target about 50,000 triangles (50 × the original 1,006).
 Optional simple PyVista desktop and Viser browser viewers, separate from physics.
 
-Numerical baseline: a MATLAB implementation of the nondispersive horizontal
+Numerical baseline: Keqi Ye's MATLAB implementation of the nondispersive horizontal
 Lagrangian P1 finite-element solver, three-point triangle quadrature, row-sum
 lumped mass and explicit Verlet integration. Bed elevation is positive upwards.
 Use float64 initially. No independent vertical velocity, dispersive extension,
