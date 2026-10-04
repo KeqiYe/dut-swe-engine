@@ -7,8 +7,8 @@ install ``-e '.[web]'`` and run::
     python examples/island_refined.py --device cpu --mesh-factor 10 \
         --viewer viser --hide-nodes --wireframe --loop --speed 0.2
 
-The original 547-node, 1006-triangle mesh and physical scene reproduce the
-MATLAB island benchmark. Integer mesh factors count triangles, not points
+The base island benchmark uses a 547-node, 1006-triangle mesh.
+Integer mesh factors count triangles, not points
 along each coordinate axis. Extra interior splits retain a conforming mesh;
 boundary resolution follows the preceding uniform 1-to-4 refinement level.
 This example defines its scene itself, without internal benchmark factories.
@@ -108,7 +108,7 @@ def _refine_interior_to(mesh, target):
 
 def build_model(device="auto", gravity=9.81, mesh_factor=1, amplitude=0.032,
                 width_scale=1.0):
-    """Build an integer multiple of the original triangle count.
+    """Build an integer multiple of the base triangle count.
 
     Uniform 1-to-4 subdivision is followed by conforming interior bisection
     when necessary. The mesh factor describes triangle count, not each axis.
@@ -153,7 +153,7 @@ def build_model(device="auto", gravity=9.81, mesh_factor=1, amplitude=0.032,
         return velocity
 
     target = original_triangles * mesh_factor
-    # The reference coast was fitted to the original pulse. A changed pulse
+    # The reference coast was fitted to the default pulse. A changed pulse
     # needs its own initially wet boundary, including on the unrefined mesh.
     if amplitude != 0.032 or width_scale != 1.0:
         mesh = _project_shoreline(mesh, bottom, initial_surface)
@@ -208,7 +208,7 @@ def main(argv=None):
     parser.add_argument("--width-scale", type=positive, default=1.0,
                         help="initial pulse width multiplier; keeps crest position and velocity")
     parser.add_argument("--mesh-factor", type=positive_integer, default=1,
-                        help="integer multiple of the original 1006 triangles")
+                        help="integer multiple of the base 1006 triangles")
     parser.add_argument("--viewer", choices=("none", "viser", "pyvista"), default="none")
     parser.add_argument("--dt", type=positive, help="physics time step in seconds")
     parser.add_argument("--duration", type=positive, help="simulation duration in seconds")
@@ -252,7 +252,7 @@ def main(argv=None):
                 print(f"Browser viewer: {viewer.url}", flush=True)
 
         print(f"Island: {settings['nodes']} nodes, {settings['triangles']} triangles "
-              f"({args.mesh_factor}× original), amplitude={args.amplitude:g} m, "
+              f"({args.mesh_factor}× base), amplitude={args.amplitude:g} m, "
               f"width scale={args.width_scale:g}, "
               f"dt={dt:g} s, duration={duration:g} s", flush=True)
         state = swe.run(

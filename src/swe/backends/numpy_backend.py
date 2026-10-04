@@ -1,4 +1,4 @@
-"""Vectorized float64 reference backend, matching the historical MATLAB kernel."""
+"""Vectorized float64 reference backend for the displacement shallow-water solver."""
 import numpy as np
 from ..terrain import GridBottom
 

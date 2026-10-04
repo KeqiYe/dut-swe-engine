@@ -9,12 +9,12 @@
 | [basic.py](basic.py) | 最小 `import swe` → 建模 → `solver.step()` → 读取结果；自己控制时间循环 |
 | [standing_wave.py](standing_wave.py) | 矩形水槽、平底和用户给定的初始水面函数 |
 | [sloshing.py](sloshing.py) | 自定义三角形网格、抛物面水底、倾斜初始水面和可选动画 |
-| [island.py](island.py) | 原 MATLAB 绕岛网格、高斯岛屿和入射脉冲，1006 单元 |
+| [island.py](island.py) | 基础绕岛网格、高斯岛屿和入射脉冲，1006 单元 |
 | [island_refined.py](island_refined.py) | 绕岛网格按单元总数加密，可关闭节点、显示三角形线框 |
 
 `src/swe/cases.py` 保留内置基准用于 CLI 和数值回归。这里的示例把相应场景
 定义展开在应用中，不调用 `swe.cases` 或 `swe.cli`。绕岛示例通过标准
-`importlib.resources` 读取随安装包分发的原始网格，不依赖当前工作目录。
+`importlib.resources` 读取随安装包分发的基础网格，不依赖当前工作目录。
 
 ## 安装和运行
 
@@ -55,7 +55,7 @@ GPU。默认 `auto` 在 CUDA 不可用时使用 CPU。示例所用数值模型�
 python examples/island_refined.py --device cpu --mesh-factor 10 --viewer viser --hide-nodes --wireframe --loop --speed 0.2 --vertical-scale 5 --duration 4
 ```
 
-`--mesh-factor 10` 将原始 1006 个三角形增加到 **10,060 个**，倍率指单元总数。
+`--mesh-factor 10` 将基础网格的 1006 个三角形增加到 **10,060 个**，倍率指单元总数。
 采用均匀四分细化，再成对二分域内长边，保持网格连续；岸线投影到初始零水深
 等高线，并保持均匀细化后的边界分辨率。因此这不是每条边等比例细分。
 10 倍加密后默认时间步为 0.0015625 秒，默认模拟 0–3 秒；此配置已通过 CPU
@@ -73,7 +73,7 @@ python examples/island_refined.py --device cpu --mesh-factor 10 --viewer viser -
 python examples/island_refined.py --device cpu --mesh-factor 10 --amplitude 0.064 --width-scale 5 --dt 0.00078125 --duration 8 --viewer viser --hide-nodes --wireframe --loop --speed 0.1 --vertical-scale 5
 ```
 
-这组参数已完成 8 秒 CPU 检查：物理波峰高于静水面 6.4 cm，为原算例的两倍，
+这组参数已完成 8 秒 CPU 检查：物理波峰高于静水面 6.4 cm，为默认振幅的两倍，
 静水位仍为 0.32 m；显示高度倍率仍为 5。每轮约 80 秒，实际速度受 CPU 算力限制。
 
 `--amplitude` 单位为米，设置初始波峰相对静水面的高度。
@@ -81,7 +81,7 @@ python examples/island_refined.py --device cpu --mesh-factor 10 --amplitude 0.06
 由于基础波宽也随振幅变化，上述参数的实际波宽约为最初 3.2 cm 波的 **3.69 倍**。
 改变波形后会重新匹配初始岸线。波形和流速仍由初值驱动数值求解，并非播放解析动画。
 
-直接将原脉冲加高到 6.4 cm 会在约 3.86 秒出现单元翻转；加宽后选用上述配置，
+直接将默认脉冲加高到 6.4 cm 会在约 3.86 秒出现单元翻转；加宽后选用上述配置，
 这次仅验证到 8 秒。记录见 [八秒验证](../validation/island_broader_wave_5x.json)
 和 [未加宽的高波测试](../validation/island_higher_wave.json)。
 

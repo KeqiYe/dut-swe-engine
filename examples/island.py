@@ -6,8 +6,8 @@ For a paced, looping browser animation, install ``-e '.[web]'`` and run::
 
     python examples/island.py --device cpu --viewer viser --loop --speed 0.5
 
-The original 547-node, 1006-triangle mesh and physical scene reproduce the
-MATLAB island benchmark. This example defines its scene itself; it does not
+The base island benchmark uses a 547-node, 1006-triangle mesh.
+This example defines its scene itself; it does not
 call the package's built-in benchmark factories or command-line application.
 """
 
@@ -24,7 +24,7 @@ import swe
 
 
 def build_model(device="auto", gravity=9.81):
-    """Build the original island scene and return its model and time settings."""
+    """Build the base island scene and return its model and time settings."""
     gravity = float(gravity)
     if not math.isfinite(gravity) or gravity <= 0:
         raise ValueError("gravity must be finite and positive")
@@ -106,7 +106,7 @@ def main(argv=None):
             if args.viewer == "viser":
                 print(f"Browser viewer: {viewer.url}", flush=True)
 
-        print(f"Original island: dt={dt:g} s, duration={duration:g} s", flush=True)
+        print(f"Base island: dt={dt:g} s, duration={duration:g} s", flush=True)
         state = swe.run(
             model, dt=dt, duration=duration, viewer=viewer,
             speed=args.speed, loop=args.loop, hold=args.hold,

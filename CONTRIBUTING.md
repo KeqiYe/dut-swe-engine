@@ -9,7 +9,7 @@ python -m pytest -q
 ```
 
 The suite checks the NumPy and Warp CPU backends; CUDA tests are skipped when
-no NVIDIA device is available. No viewer or MATLAB installation is required.
+no NVIDIA device is available. No viewer or external simulation software is required.
 For numerical changes, report the backend, precision, mesh, initial state,
 time step, and duration. Add a regression that checks a physical invariant,
 an independent reference, convergence, or rejected-step state preservation.

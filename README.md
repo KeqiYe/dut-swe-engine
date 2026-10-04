@@ -3,14 +3,13 @@
 A Python displacement-based shallow-water engine with a NumPy CPU backend and optional NVIDIA Warp CUDA acceleration.
 
 `dut-swe-engine` 是可通过 `import swe` 使用的 Python 包，CPU 核心只依赖 NumPy，
-CUDA 加速和实时查看器均为可选依赖。原 MATLAB 源代码由 **Keqi Ye（KeqiYe）**
-在硕士研究期间编写；本项目将其数值核心移植为 Python，并提供 CPU/CUDA 后端。
+CUDA 加速和实时查看器均为可选依赖。
 求解器采用水平拉格朗日三角形网格、三点 Hammer 积分、集中质量和显式 Verlet 推进。
 水底高程向上为正，使用 SI 单位。
 
 这是**非色散、深度平均浅水模型**；三维显示由水平位置、水深和地形重建，
 没有独立求解竖向速度。当前仍是研究用实现，适用范围与已知稳定性限制见下文。
-本仓库包含 Python 引擎、示例、测试及生成的基准数据，不包含原 MATLAB 程序或论文 PDF。
+本仓库包含 Python 引擎、示例、测试及基准数据。
 
 ## 快速开始
 
@@ -218,7 +217,7 @@ python validation/run_validation.py --device cpu --output validation/cpu_results
 python validation/run_validation.py --device cuda --scale --output validation/cuda_results.json
 ```
 
-验收包含 MATLAB 10 秒对照、平底静水、线性小振幅驻波、抛物面水盆解析晃荡、
+验收包含绕岛 10 秒冻结基准对照、平底静水、线性小振幅驻波、抛物面水盆解析晃荡、
 时间/空间收敛、CPU/CUDA 一致性及失败事务性。公式与适用范围见
 [算例说明](docs/BENCHMARKS.md)，最新实测和限制见 [验证报告](validation/REPORT.md)。
 
@@ -226,7 +225,7 @@ python validation/run_validation.py --device cuda --scale --output validation/cu
 岸线节点重新投影到初始零水深等高线；几何随加密变化，不能据此直接解释空间阶。
 **加密绕岛默认仅运行 3 秒**。三级网格在更长时间出现强压缩，原步长、半步长和
 四分之一步长分别在约 3.96、4.03、4.08 秒拒绝推进；尚未解决其 10 秒稳定性。
-原始网格仍默认运行 10 秒。指定更长的 `--duration` 不代表该配置已验证。
+基础网格仍默认运行 10 秒。指定更长的 `--duration` 不代表该配置已验证。
 默认晃荡三个周期的材料位移仍有约 6.6% 振幅的 RMS 误差，不能用守恒良好
 替代形状精度判断。
 
@@ -254,17 +253,16 @@ ssh -N -L 8080:127.0.0.1:8080 gpu-host
 打开本地 [http://127.0.0.1:8080](http://127.0.0.1:8080)。服务默认仅监听环回地址；
 查看器可完全关闭，服务器无需桌面环境。
 
-## 许可证与来源
+## 许可证与参考文献
 
-本项目按 [MIT License](LICENSE) 发布；代码和基准数据的来源说明见 [NOTICE.md](NOTICE.md)。
-原 MATLAB 源代码作者为 **Keqi Ye（KeqiYe）**。数学方法参考 Feng Wu 与
-Wanxie Zhong 的论文：
+本项目按 [MIT License](LICENSE) 发布；数学方法和基准数据说明见 [NOTICE.md](NOTICE.md)。
+基础位移浅水波方法参考：
 
 > Wu, F., & Zhong, W. (2017). On displacement shallow water wave equation and
 > symplectic solution. *Computer Methods in Applied Mechanics and Engineering*,
 > 318, 431–455. [doi:10.1016/j.cma.2017.01.040](https://doi.org/10.1016/j.cma.2017.01.040).
 
-作者关于位移浅水波数值振荡抑制的相关研究：
+位移浅水波数值振荡抑制的相关研究：
 
 > Ye, K., Zhao, Y., Wu, F., & Zhong, W. (2022). An adaptive artificial viscosity
 > for the displacement shallow water wave equation. *Applied Mathematics and
@@ -277,4 +275,4 @@ Wanxie Zhong 的论文：
 使用基础位移法时引用 Wu & Zhong (2017)；讨论或采用 AAV 时引用 Ye et al. (2022)。
 完整 BibTeX 见 [references.bib](references.bib)。
 
-方法引用不表示论文作者为本实现背书；本仓库的许可证不授予原 MATLAB 程序或论文的权利。
+方法引用不表示论文作者为本实现背书。论文与第三方依赖保留各自的版权和许可。

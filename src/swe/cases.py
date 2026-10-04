@@ -17,9 +17,9 @@ def _positive(name, value):
 
 
 def island(device="auto", refinements=0, gravity=9.81):
-    """The original 547-node MATLAB island case, optionally refined.
+    """The 547-node base island case, optionally refined.
 
-    ``refinements=3`` gives 64,384 triangles (64 times the original).
+    ``refinements=3`` gives 64,384 triangles (64 times the base mesh).
     Refinement projects the island shoreline onto the initial zero-depth
     contour. Merely bisecting straight coastal edges would put their new
     vertices on the dry side of the curved island shore.
@@ -86,10 +86,10 @@ def island(device="auto", refinements=0, gravity=9.81):
         "name": "island",
         "dt": 0.00625 / 2**refinements * np.sqrt(9.81 / gravity),
         "duration": (10.0 if refinements==0 else 3.0) * np.sqrt(9.81 / gravity),
-        "validation_limit": ("Original mesh verified for 10 s" if refinements==0 else
+        "validation_limit": ("Base mesh verified for 10 s" if refinements==0 else
                              "Refined island verified for 3 s only; compression causes rejection near 4 s at level 3"),
-        "description": "Original MATLAB Gaussian island and sech-squared pulse; nondispersive model.",
-        "reference": "MATLAB swe3d_minimal, original mesh and dt=0.00625 at gravity=9.81",
+        "description": "Gaussian island and sech-squared pulse on the base mesh; nondispersive model.",
+        "reference": "Frozen 10 s baseline on the base mesh at dt=0.00625 and gravity=9.81",
         "refinements": refinements,
     }
 
